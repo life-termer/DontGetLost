@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "462873373198",
+    "project_id": "dsurchin-fe4f2",
+    "storage_bucket": "dsurchin-fe4f2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:462873373198:android:2dae6a35be1cf6f3fbea5f",
+        "android_client_info": {
+          "package_name": "at.dontgetlost"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAe3p4IrCaWedtC-2ftYHTJfLia88R86VM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
