@@ -1,5 +1,5 @@
 /* eslint-disable no-bitwise */
-import { useMemo, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import { PermissionsAndroid, Platform } from "react-native";
 
 import * as ExpoDevice from "expo-device";
@@ -13,6 +13,7 @@ import {
   Device,
   ScanMode,
 } from "react-native-ble-plx";
+import { GlobalContext } from "@/context/GlobalContext";
 
 const DATA_SERVICE_UUID = "19b10000-e8f2-537e-4f6c-d104768a1214";
 const COLOR_CHARACTERISTIC_UUID = "19b10001-e8f2-537e-4f6c-d104768a1217";
@@ -22,6 +23,8 @@ const bleManager = new BleManager();
 function useBLE() {
   const [allDevices, setAllDevices] = useState<Device[]>([]);
   const [connectedDevice, setConnectedDevice] = useState<Device | null>(null);
+
+  const { isScanning, setIsScanning } = useContext(GlobalContext);
 
   const requestAndroid31Permissions = async () => {
     console.log("requestAndroid31Permissions");
@@ -209,6 +212,7 @@ function useBLE() {
       }
 
       console.log("Starting device scan...");
+      setIsScanning(true);
       bleManager.startDeviceScan(
         null,
         {
@@ -218,6 +222,7 @@ function useBLE() {
         (error, device) => {
           if (error) {
             console.log("Scanning error:", error);
+            setIsScanning(false);
             return;
           }
 
@@ -266,6 +271,7 @@ function useBLE() {
 
   const stopScanForPeripherals = () => {
     bleManager.stopDeviceScan();
+    setIsScanning(false);
   };
   const onDataUpdate = (
     error: BleError | null,

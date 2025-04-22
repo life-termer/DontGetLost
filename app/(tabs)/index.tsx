@@ -1,20 +1,17 @@
 import {
-  Image,
   StyleSheet,
-  Platform,
   Button,
   TouchableOpacity,
-  Text,
   View,
 } from "react-native";
 
-import { HelloWave } from "@/components/HelloWave";
-import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { useState } from "react";
 import { getUsers } from "@/scripts/firebase-data";
 import useBLE from "@/hooks/useBLE";
+import CustomScrollView from "@/components/CustomScrollView";
+import { ScanControl } from "@/components/ScanControl";
 
 export default function HomeScreen() {
   const {
@@ -51,17 +48,20 @@ export default function HomeScreen() {
   };
   // console.log('allDevices', allDevices)
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: "#A1CEDC", dark: "#1D3D47" }}
-      headerImage={
-        <Image
-          source={require("@/assets/images/partial-react-logo.png")}
-          style={styles.reactLogo}
-        />
-      }
-    >
+    // <ParallaxScrollView
+    //   headerBackgroundColor={{ light: "#A1CEDC", dark: "#1D3D47" }}
+    //   headerImage={
+    //     <Image
+    //       source={require("@/assets/images/react-logo.png")}
+    //       style={styles.reactLogo}
+    //       resizeMode="contain"
+    //     />
+    //   }
+    // >
+    <CustomScrollView>
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">{`Welcome${
+        <ScanControl />
+        {/* <ThemedText type="title">{`Welcome${
           user ? `, ${user.name}!` : "!"
         }`}</ThemedText>
         <HelloWave />
@@ -69,23 +69,35 @@ export default function HomeScreen() {
           <ThemedText type="subtitle">
             You are logged with email: {user.email}
           </ThemedText>
-        )}
+        )} */}
       </ThemedView>
-      <ThemedView style={styles.stepContainer}>
+      {/* <ThemedView style={styles.stepContainer}>
         <ThemedText type="subtitle">Bluetooth Scan Test</ThemedText>
+        <ThemedText>Bluetooth Scan Test</ThemedText>
         <ThemedView style={styles.rowContainer}>
           <Button title="Sign in" onPress={onPressGetUser} />
+          <Pressable
+            style={({ pressed }: { pressed: boolean }) => [
+              styles.buttonWrapper,
+              pressed && styles.buttonPressed,
+            ]}
+            onPress={() => console.log("button pressed")}
+          >
+            <ThemedText style={styles.buttonPrimary}>Press me</ThemedText>
+          </Pressable>
           <Button
             title="Sign out"
             onPress={() => {
               setUser(undefined);
             }}
           />
-        </ThemedView>
-        <Button title="Clear All" onPress={clearAll} />
+        </ThemedView> *
+        <Button title="Clear All" onPress={clearAll} color={"#000"} />
         <Button title="Scan for devices" onPress={scanForDevices} />
         <Button title="Stop Scan" onPress={stopScanForPeripherals} />
-      </ThemedView>
+
+
+      </ThemedView> */}
       {connectedDevice && (
         <ThemedView style={styles.textStepContainer}>
           <ThemedText type="subtitle">
@@ -126,7 +138,7 @@ export default function HomeScreen() {
         ))}
       </ThemedView>
       <ThemedView style={styles.stepContainer}></ThemedView>
-    </ParallaxScrollView>
+    </CustomScrollView>
   );
 }
 
@@ -151,6 +163,23 @@ const styles = StyleSheet.create({
   textStepContainer: {
     gap: 2,
     marginBottom: 30,
+  },
+  buttonWrapper: {
+    width: 100,
+    height: 40,
+    display: "flex",
+    justifyContent: "center",
+    boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
+    alignItems: "center",
+    backgroundColor: "#be4e4e",
+  },
+  buttonPressed: {
+    backgroundColor: "#aa4646",
+    color: "#b3b3b3",
+  },
+  buttonPrimary: {
+    fontFamily: "OpenSans",
+    color: "#ffffff",
   },
   reactLogo: {
     height: 178,

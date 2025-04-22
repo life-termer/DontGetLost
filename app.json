@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "DontGetLost",
-    "slug": "DontGetLost",
-    "version": "1.0.15",
+    "name": "BLESearchDmitry",
+    "slug": "BLESearchDmitry",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
@@ -10,7 +10,7 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "at.dontgetlost",
+      "bundleIdentifier": "BLESearchDmitry",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -25,8 +25,7 @@
         "android.permission.BLUETOOTH_ADMIN",
         "android.permission.BLUETOOTH_CONNECT"
       ],
-      "package": "at.dontgetlost",
-      "googleServicesFile": "./google-services.json"
+      "package": "Dmitry.BLESearch"
     },
     "web": {
       "bundler": "metro",
@@ -44,6 +43,29 @@
           "backgroundColor": "#ffffff"
         }
       ],
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./assets/fonts/Montserrat/Montserrat-Regular.ttf",
+            "./assets/fonts/Montserrat/Montserrat-Italic.ttf",
+            "./assets/fonts/Montserrat/Montserrat-Light.ttf",
+            "./assets/fonts/Montserrat/Montserrat-LightItalic.ttf",
+            "./assets/fonts/Montserrat/Montserrat-SemiBold.ttf",
+            "./assets/fonts/Montserrat/Montserrat-SemiBoldItalic.ttf",
+            "./assets/fonts/Montserrat/Montserrat-Bold.ttf",
+            "./assets/fonts/Montserrat/Montserrat-BoldItalic.ttf",
+            "./assets/fonts/Open_Sans/OpenSans-Regular.ttf",
+            "./assets/fonts/Open_Sans/OpenSans-Italic.ttf",
+            "./assets/fonts/Open_Sans/OpenSans-Light.ttf",
+            "./assets/fonts/Open_Sans/OpenSans-LightItalic.ttf",
+            "./assets/fonts/Open_Sans/OpenSans-SemiBold.ttf",
+            "./assets/fonts/Open_Sans/OpenSans-SemiBoldItalic.ttf",
+            "./assets/fonts/Open_Sans/OpenSans-Bold.ttf",
+            "./assets/fonts/Open_Sans/OpenSans-BoldItalic.ttf"
+          ]
+        }
+      ],
       "react-native-ble-plx"
     ],
     "experiments": {
@@ -54,7 +76,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "4463641b-d62c-41f5-8af8-e659bc7e5aaa"
+        "projectId": "0fd07aa1-4550-478d-a67c-533374f93d1f"
       }
     }
   }

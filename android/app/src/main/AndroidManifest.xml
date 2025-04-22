@@ -31,8 +31,8 @@
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
         <data android:scheme="myapp"/>
-        <data android:scheme="at.dontgetlost"/>
-        <data android:scheme="exp+dontgetlost"/>
+        <data android:scheme="Dmitry.BLESearch"/>
+        <data android:scheme="exp+blesearchdmitry"/>
       </intent-filter>
     </activity>
   </application>

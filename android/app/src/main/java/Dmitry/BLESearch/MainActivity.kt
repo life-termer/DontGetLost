@@ -1,4 +1,4 @@
-package at.dontgetlost
+package Dmitry.BLESearch
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build

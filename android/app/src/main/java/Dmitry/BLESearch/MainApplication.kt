@@ -1,4 +1,4 @@
-package at.dontgetlost
+package Dmitry.BLESearch
 
 import android.app.Application
 import android.content.res.Configuration

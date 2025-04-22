@@ -14,9 +14,10 @@
       "distribution": "internal"
     },
     "preview": {
+      "developmentClient": false,
       "distribution": "internal"
     },
-    "production": {}
+    "production": {"autoIncrement": true}
   },
   "submit": {
     "production": {}
