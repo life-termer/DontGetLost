@@ -27,7 +27,7 @@ export function ScanControl({
   const { isScanning, setIsScanning } = useContext(GlobalContext);
 
   const {
-    allDevices,
+    // allDevices,
     connectedDevice,
     connectToDevice,
     requestPermissions,
@@ -35,7 +35,6 @@ export function ScanControl({
     stopScanForPeripherals,
     clearAll,
   } = useBLE();
-
   const colorPlay = useThemeColor(
     { light: lightColor, dark: darkColor },
     "green"
@@ -64,10 +63,8 @@ export function ScanControl({
   };
   const handleStopScan = () => {
     if (stopScanForPeripherals) {
-      if (stopScanForPeripherals) {
-        console.log("Scan for devices stopped");
-        stopScanForPeripherals();
-      }
+      console.log("Scan for devices stopped");
+      stopScanForPeripherals();
     }
   };
 
@@ -75,7 +72,7 @@ export function ScanControl({
     <ThemedView style={styles.controlsWrapper}>
       {isScanning ? (
         <>
-          <ThemedText>Scanning ...</ThemedText>
+          <ThemedText style={{ fontSize: 14 }}>Scanning ...</ThemedText>
           <TouchableHighlight
             activeOpacity={0.6}
             underlayColor="#dddddd0"
@@ -99,7 +96,7 @@ export function ScanControl({
 
 const styles = StyleSheet.create({
   controlsWrapper: {
-    width: "100%",
+    backgroundColor: "#fff ",
     display: "flex",
     flexDirection: "row",
     gap: 12,

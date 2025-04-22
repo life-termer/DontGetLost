@@ -1,5 +1,5 @@
 /* eslint-disable no-bitwise */
-import { useContext, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { PermissionsAndroid, Platform } from "react-native";
 
 import * as ExpoDevice from "expo-device";
@@ -21,10 +21,19 @@ const COLOR_CHARACTERISTIC_UUID = "19b10001-e8f2-537e-4f6c-d104768a1217";
 const bleManager = new BleManager();
 
 function useBLE() {
-  const [allDevices, setAllDevices] = useState<Device[]>([]);
+  // const [allDevices, setAllDevices] = useState<Device[]>([]);
+  const { allDevices, setAllDevices } = useContext(GlobalContext);
   const [connectedDevice, setConnectedDevice] = useState<Device | null>(null);
-
+  const [bluetoothState, setBluetoothState] = useState<"on" | "off">("off");
   const { isScanning, setIsScanning } = useContext(GlobalContext);
+
+  bleManager.onStateChange((state) => {
+    if (state === "PoweredOn") {
+      setBluetoothState("on");
+    } else {
+      setBluetoothState("off");
+    }
+  }, true);
 
   const requestAndroid31Permissions = async () => {
     console.log("requestAndroid31Permissions");
@@ -156,7 +165,6 @@ function useBLE() {
               // console.log(`Characteristic UUID: ${characteristic.uuid}`);
 
               // Example of mapping UUID to a human-readable name
-             
 
               console.log(
                 `Characteristic ${characteristic.uuid} integer value: ${intValue}`
@@ -233,15 +241,15 @@ function useBLE() {
           // Adjust these conditions based on your needs
           const isTargetDevice =
             device.id === "BC:57:29:05:DC:16" || device.name !== null;
-
-          if (isTargetDevice) {
-            setAllDevices((prevState: any) => {
+          // console.log("Discovered device:", device);
+          if (true) {
+            setAllDevices((prevState: any[]) => {
               const txPower = -50; // Replace with the actual TX power of your device
               const distance =
                 device.rssi !== null
                   ? calculateDistance(device.rssi, txPower)
                   : -1;
-              console.log(distance + "m");
+              // console.log(distance + "m");
 
               const existingIndex = prevState.findIndex(
                 (d: { id: string }) => d.id === device.id
@@ -249,7 +257,11 @@ function useBLE() {
 
               const updatedDevice = {
                 ...device,
+                name: device.name || "Unknown Device",
                 distance: distance,
+                lastUpdated: Date.now(), // Add a timestamp for the last update
+                isFavorite: prevState[existingIndex]?.isFavorite || false, // Preserve favorite status
+                isOutOfRange: false, // Reset out-of-range status when the device is updated
               };
 
               if (existingIndex > -1) {
@@ -260,6 +272,8 @@ function useBLE() {
               } else {
                 // Add new device
                 console.log("Adding device to list:", device.id);
+
+                console.log("Device RSSI:", device.rssi);
                 return [...prevState, updatedDevice];
               }
             });
@@ -268,6 +282,34 @@ function useBLE() {
       );
     });
   };
+
+  // Periodically remove stale devices
+  useEffect(() => {
+    if (isScanning) {
+      const interval = setInterval(() => {
+        setAllDevices((prevState: any[]) => {
+          const now = Date.now();
+          return prevState
+            .map((device) => {
+              if (now - device.lastUpdated > 10000) {
+                if (device.isFavorite) {
+                  // Mark favorite devices as out of range
+                  return { ...device, isOutOfRange: true };
+                } else {
+                  // Remove non-favorite devices
+                  return null;
+                }
+              }
+              // Reset out-of-range status for devices that are updated
+              return { ...device, isOutOfRange: false };
+            })
+            .filter(Boolean); // Remove null entries
+        });
+      }, 1000); // Check every second
+
+      return () => clearInterval(interval); // Cleanup on unmount
+    }
+  }, [isScanning]);
 
   const stopScanForPeripherals = () => {
     bleManager.stopDeviceScan();
@@ -300,17 +342,15 @@ function useBLE() {
 
   const clearAll = async () => {
     setAllDevices([]);
-      console.log("Cleared all devices");
+    console.log("Cleared all devices");
     try {
       // Disconnect the currently connected device
       if (connectedDevice) {
         await bleManager.cancelDeviceConnection(connectedDevice.id);
         console.log(`Disconnected from device: ${connectedDevice.id}`);
-        
       }
 
       // Clear the list of all devices
-      
     } catch (error) {
       console.log("Error clearing devices:", error);
     }
@@ -319,13 +359,14 @@ function useBLE() {
 
   return {
     connectToDevice,
-    allDevices,
+    // allDevices,
     connectedDevice,
     requestPermissions,
     scanForPeripherals,
     stopScanForPeripherals,
     startStreamingData,
     clearAll,
+    bluetoothState,
   };
 }
 
