@@ -272,8 +272,6 @@ function useBLE() {
               } else {
                 // Add new device
                 console.log("Adding device to list:", device.id);
-
-                console.log("Device RSSI:", device.rssi);
                 return [...prevState, updatedDevice];
               }
             });

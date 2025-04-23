@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, useColorScheme } from "react-native";
 
 import { ThemedView } from "@/components/ThemedView";
 import { useContext, useState } from "react";
@@ -10,8 +10,10 @@ import { BluetoothState } from "@/components/BluetoothState";
 import { GlobalContext } from "@/context/GlobalContext";
 import AllDevicesList from "@/components/AllDevicesList";
 import FavoriteDevicesList from "@/components/FavoriteDevicesList";
+import { Colors } from "@/constants/Colors";
 
 export default function HomeScreen() {
+  const colorScheme = useColorScheme();
   const {
     // allDevices,
     connectedDevice,
@@ -46,7 +48,7 @@ export default function HomeScreen() {
   };
   return (
     <>
-      <ThemedView style={styles.titleContainer}>
+      <ThemedView style={[{backgroundColor: Colors[colorScheme ?? "light"].backgroundLight},styles.titleContainer]}>
         <BluetoothState />
         <ScanControl />
       </ThemedView>
@@ -60,7 +62,6 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   titleContainer: {
-    backgroundColor: "#fff ",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",

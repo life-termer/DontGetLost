@@ -5,8 +5,8 @@ import { Device } from "react-native-ble-plx";
 export const GlobalContext = createContext<{
   isScanning: boolean;
   setIsScanning: (value: boolean) => void;
-  allDevices: any[];
-  setAllDevices: (devices: any[]) => void;
+  allDevices: Device[];
+  setAllDevices: React.Dispatch<React.SetStateAction<Device[]>>;
   favoriteDevices: any[];
   setFavoriteDevices: (devices: any[]) => void;
 }>({

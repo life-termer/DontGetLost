@@ -30,10 +30,14 @@ export function BluetoothState({
     { light: lightColor, dark: darkColor },
     "tint"
   );
+  const colorBackground = useThemeColor(
+    { light: lightColor, dark: darkColor },
+    "background"
+  );
   const colorRed = useThemeColor({ light: lightColor, dark: darkColor }, "red");
 
   return (
-    <ThemedView style={styles.badge}>
+    <ThemedView style={[{backgroundColor: colorBackground},styles.badge]}>
       <ThemedText
         style={
           bluetoothState === "on"
@@ -49,13 +53,13 @@ const styles = StyleSheet.create({
   badge: {
     display: "flex",
     flexDirection: "row",
-    padding: 10,
+    padding: 15,
     paddingTop: 5,
     paddingBottom: 5,
     borderRadius: 16,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#55b2ff55",
+    // backgroundColor: "#55b2ff55",
   },
   text: {
     fontSize: 14,

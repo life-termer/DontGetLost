@@ -1,33 +1,28 @@
 import {
   useContext,
   useEffect,
-  type PropsWithChildren,
-  type ReactElement,
 } from "react";
-import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
-import Animated, {
-  interpolate,
-  useAnimatedRef,
-  useAnimatedStyle,
-  useScrollViewOffset,
-} from "react-native-reanimated";
+import { StyleSheet} from "react-native";
+
 
 import { ThemedView } from "@/components/ThemedView";
-import { useBottomTabOverflow } from "@/components/ui/TabBarBackground";
-import { useColorScheme } from "@/hooks/useColorScheme";
 import { GlobalContext } from "@/context/GlobalContext";
 import { ThemedText } from "./ThemedText";
 import DeviceCard from "./DeviceCard";
 
+
 export default function FavoriteDevicesList() {
   const { allDevices, favoriteDevices, setFavoriteDevices } =
     useContext(GlobalContext);
-
   // Automatically update favoriteDevices when allDevices changes
   useEffect(() => {
-    const favorites = allDevices.filter((device) => device.isFavorite);
-    setFavoriteDevices(favorites);
-  }, [allDevices]);
+    const favorites = allDevices.filter((device:any) => device.isFavorite);
+    if (
+      JSON.stringify(favorites) !== JSON.stringify(favoriteDevices)
+    ) {
+      setFavoriteDevices(favorites);
+    }
+  }, [allDevices, setFavoriteDevices]);
   return (
     <>
       {favoriteDevices.length > 0 && (
