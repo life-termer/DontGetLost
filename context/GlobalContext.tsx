@@ -1,7 +1,7 @@
 import { createContext, useState, useEffect } from "react";
 import { ReactNode } from "react";
 import { Device } from "react-native-ble-plx";
-// import AsyncStorage from "@react-native-async-storage/async-storage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const GlobalContext = createContext<{
   isScanning: boolean;
@@ -24,54 +24,63 @@ const GlobalProvider = ({ children }: { children: ReactNode }) => {
   const [allDevices, setAllDevices] = useState<any[]>([]);
   const [favoriteDevices, setFavoriteDevices] = useState<any[]>([]);
 
-  // useEffect(() => {
-  //   const loadFavoriteDevices = async () => {
-  //     console.log("Starting loading favorite devices from storage");
-  //     try {
-  //       const storedFavorites = await AsyncStorage.getItem("favoriteDevices");
-  //       if (storedFavorites) {
-  //         setFavoriteDevices(JSON.parse(storedFavorites));
-  //       }
-  //     } catch (error) {
-  //       console.log("Failed to load favorite devices from storage", error);
-  //     }
-  //     console.log("Finished loading favorite devices from storage");
-  //   };
+  useEffect(() => {
+    const loadFavoriteDevices = async () => {
+      console.log("Starting loading favorite devices from storage");
+      try {
+        const storedFavorites = await AsyncStorage.getItem("favoriteDevices");
+        if (storedFavorites) {
+          setFavoriteDevices(JSON.parse(storedFavorites));
+        }
+      } catch (error) {
+        console.log("Failed to load favorite devices from storage", error);
+      }
+      console.log("Finished loading favorite devices from storage");
+    };
 
-  //   loadFavoriteDevices();
-  // }, []);
+    loadFavoriteDevices();
+  }, []);
 
-  // useEffect(() => {
-  //   const saveFavoriteDevices = async () => {
-  //     try {
-  //       await AsyncStorage.setItem(
-  //         "favoriteDevices",
-  //         JSON.stringify(favoriteDevices)
-  //       );
-  //     } catch (error) {
-  //       console.log("Failed to save favorite devices to storage", error);
-  //     }
-  //   };
+  useEffect(() => {
+    const saveFavoriteDevices = async () => {
+      console.log("Starting saving favorite devices to storage");
+      try {
+        await AsyncStorage.setItem(
+          "favoriteDevices",
+          JSON.stringify(favoriteDevices)
+        );
+      } catch (error) {
+        console.log("Failed to save favorite devices to storage", error);
+      }
+    };
 
-  //   saveFavoriteDevices();
-  // }, [favoriteDevices]);
+    saveFavoriteDevices();
+    console.log("favoriteDevices", favoriteDevices);
+  }, [favoriteDevices]);
 
-  // useEffect(() => {
-  //   // Update allDevices with favorite status from loaded favoriteDevices
-  //   setAllDevices((prevAllDevices) => {
-  //     return prevAllDevices.map((device) => {
-  //       const isFavorite = favoriteDevices.some(
-  //         (favDevice) => favDevice.id === device.id
-  //       );
-  //       return {
-        //   ...device,
-        //   isFavorite: !!favDevice, // Set isFavorite based on existence in favoriteDevices
-        //   favoriteTimestamp: favDevice ? favDevice.favoriteTimestamp : null, // Set timestamp if it exists
-        //   customName: favDevice ? favDevice.customName : null, // Set customName if it exists
-        // };
-  //     });
-  //   });
-  // }, [favoriteDevices]);
+  useEffect(() => {
+    // Update allDevices with favorite status from loaded favoriteDevices
+    console.log("Starting to update allDevices with favorite status");
+    setAllDevices((prevAllDevices) => {
+      return prevAllDevices.map((device) => {
+        const isFavorite = favoriteDevices.some(
+          (favDevice) => favDevice.id === device.id
+        );
+        return {
+          ...device,
+          isFavorite: isFavorite, // Set isFavorite based on existence in favoriteDevices
+          favoriteTimestamp: isFavorite
+            ? favoriteDevices.find((favDevice) => favDevice.id === device.id)
+                ?.favoriteTimestamp
+            : null, // Set timestamp if it exists
+          customName: isFavorite
+            ? favoriteDevices.find((favDevice) => favDevice.id === device.id)
+                ?.customName
+            : null, // Set customName if it exists
+        };
+      });
+    });
+  }, []);
 
   return (
     <GlobalContext.Provider
