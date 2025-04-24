@@ -21,7 +21,6 @@ const COLOR_CHARACTERISTIC_UUID = "19b10001-e8f2-537e-4f6c-d104768a1217";
 const bleManager = new BleManager();
 
 function useBLE() {
-  // const [allDevices, setAllDevices] = useState<Device[]>([]);
   const { allDevices, setAllDevices } = useContext(GlobalContext);
   const [connectedDevice, setConnectedDevice] = useState<Device | null>(null);
   const [bluetoothState, setBluetoothState] = useState<"on" | "off">("off");
@@ -225,7 +224,8 @@ function useBLE() {
         null,
         {
           allowDuplicates: false,
-          scanMode: ScanMode.LowLatency,
+          // scanMode: ScanMode.LowLatency,
+          scanMode: ScanMode.LowPower,
         },
         (error, device) => {
           if (error) {
@@ -262,6 +262,10 @@ function useBLE() {
                 lastUpdated: Date.now(), // Add a timestamp for the last update
                 isFavorite: prevState[existingIndex]?.isFavorite || false, // Preserve favorite status
                 isOutOfRange: false, // Reset out-of-range status when the device is updated
+                customName:
+                  prevState[existingIndex]?.customName || undefined, // Preserve customName
+                favoriteTimestamp:
+                  prevState[existingIndex]?.favoriteTimestamp || undefined, // Preserve favoriteTimestamp
               };
 
               if (existingIndex > -1) {

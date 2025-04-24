@@ -8,10 +8,11 @@ import { StyleSheet} from "react-native";
 import { ThemedView } from "@/components/ThemedView";
 import { GlobalContext } from "@/context/GlobalContext";
 import { ThemedText } from "./ThemedText";
+import DeviceCardFavorites from "./DeviceCardFavorites";
 import DeviceCard from "./DeviceCard";
 
 
-export default function FavoriteDevicesList() {
+export default function FavoriteDevicesList({tab}:{tab:string | undefined}) {
   const { allDevices, favoriteDevices, setFavoriteDevices } =
     useContext(GlobalContext);
   // Automatically update favoriteDevices when allDevices changes
@@ -26,13 +27,13 @@ export default function FavoriteDevicesList() {
   return (
     <>
       {favoriteDevices.length > 0 && (
-        <ThemedView style={styles.listContainer}>
+        <ThemedView style={[{paddingBottom: tab === "favorites" ? 32: 0}, styles.listContainer]}>
           <ThemedText type="title" style={styles.title}>
-            Favorites
+            Favorite Devices
           </ThemedText>
           <ThemedView style={styles.listWrapper}>
             {favoriteDevices.map((device: any) => {
-              return <DeviceCard device={device} key={device.id} />;
+              return tab === "favorites" ? <DeviceCardFavorites device={device} key={device.id} /> : <DeviceCard device={device} key={device.id} />;
             })}
           </ThemedView>
         </ThemedView>
@@ -43,8 +44,8 @@ export default function FavoriteDevicesList() {
 
 const styles = StyleSheet.create({
   listContainer: {
-    // minHeight: "80%",
     padding: 16,
+    
   },
   listWrapper: {
     borderRadius: 12,
@@ -55,7 +56,8 @@ const styles = StyleSheet.create({
   },
   title: {
     paddingLeft: 10,
-    fontSize: 16,
-    opacity: 0.7,
+    fontSize: 15,
+    textTransform: "uppercase",
+    opacity: 0.6,
   },
 });

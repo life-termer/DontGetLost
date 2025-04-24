@@ -18,18 +18,22 @@ export default function AllDevicesList() {
   const { allDevices } = useContext(GlobalContext);
   //   console.log("AllDevicesList", allDevices);
   return (
-    <ThemedView style={styles.listContainer}>
-      <ThemedText type="title" style={styles.title}>
-        All Devices
-      </ThemedText>
-      <ThemedView style={styles.listWrapper}>
-        {allDevices.map((device: any) => {
-          return device.isFavorite === false ? (
-            <DeviceCard device={device} key={device.id} />
-          ) : null;
-        })}
-      </ThemedView>
-    </ThemedView>
+    <>
+      {allDevices.length > 0 && (
+        <ThemedView style={styles.listContainer}>
+          <ThemedText type="title" style={styles.title}>
+            All Devices
+          </ThemedText>
+          <ThemedView style={styles.listWrapper}>
+            {allDevices.map((device: any) => {
+              return device.isFavorite === false ? (
+                <DeviceCard device={device} key={device.id} />
+              ) : null;
+            })}
+          </ThemedView>
+        </ThemedView>
+      )}
+    </>
   );
 }
 
@@ -49,7 +53,8 @@ const styles = StyleSheet.create({
   },
   title: {
     paddingLeft: 10,
-    fontSize: 16,
-    opacity: 0.7,
+    textTransform: "uppercase",
+    fontSize: 15,
+    opacity: 0.6,
   },
 });

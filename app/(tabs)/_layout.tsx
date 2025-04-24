@@ -33,6 +33,7 @@ export default function TabLayout() {
             title: "Ble Scanner",
             headerStyle: {
               backgroundColor: Colors[colorScheme ?? "light"].backgroundLight,
+              boxShadow: "0px 0px 0px #000",
             },
             headerTintColor: Colors[colorScheme ?? "light"].text,
             headerBackTitleStyle: {
@@ -54,7 +55,8 @@ export default function TabLayout() {
           options={{
             title: "Favorites",
             headerStyle: {
-              backgroundColor: Colors[colorScheme ?? "light"].background,
+              backgroundColor: Colors[colorScheme ?? "light"].backgroundLight,
+              boxShadow: "0px 0px 0px #000",
             },
             headerTintColor: Colors[colorScheme ?? "light"].text,
             headerBackTitleStyle: {
@@ -75,7 +77,8 @@ export default function TabLayout() {
           options={{
             title: "Settings",
             headerStyle: {
-              backgroundColor: Colors[colorScheme ?? "light"].tint,
+              backgroundColor: Colors[colorScheme ?? "light"].backgroundLight,
+              boxShadow: "0px 0px 0px #000",
             },
             headerTintColor: Colors[colorScheme ?? "light"].text,
             headerBackTitleStyle: {

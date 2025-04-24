@@ -28,7 +28,7 @@ export function BluetoothState({
 
   const colorBlue = useThemeColor(
     { light: lightColor, dark: darkColor },
-    "tint"
+    "blue"
   );
   const colorBackground = useThemeColor(
     { light: lightColor, dark: darkColor },
@@ -59,7 +59,6 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     justifyContent: "center",
     alignItems: "center",
-    // backgroundColor: "#55b2ff55",
   },
   text: {
     fontSize: 14,

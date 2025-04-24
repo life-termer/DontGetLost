@@ -1,5 +1,6 @@
 import { useContext, type PropsWithChildren, type ReactElement } from "react";
 import {
+  Platform,
   ScrollView,
   StyleSheet,
   type TextProps,
@@ -48,13 +49,13 @@ export default function DeviceCard({
     { light: lightColor, dark: darkColor },
     "yellow"
   );
-  const colorTint = useThemeColor(
+  const colorBlue = useThemeColor(
     { light: lightColor, dark: darkColor },
-    "tint"
+    "blue"
   );
-  const colorGray = useThemeColor(
+  const colorIcon = useThemeColor(
     { light: lightColor, dark: darkColor },
-    "gray"
+    "icon"
   );
   const colorBackground = useThemeColor(
     { light: lightColor, dark: darkColor },
@@ -63,30 +64,37 @@ export default function DeviceCard({
 
   const colorStatus = (distance: number | undefined) => {
     if (distance === undefined) {
-      return colorGray;
+      return colorIcon;
     }
     if (distance < 1) {
       return colorGreen;
     } else if (distance < 4) {
       return colorYellow;
     } else {
-      return colorTint;
+      return colorBlue;
     }
   };
   const colorRed = useThemeColor({ light: lightColor, dark: darkColor }, "red");
   const { setAllDevices } = useContext(GlobalContext);
+  
   const toggleFavorite = (deviceId: string) => {
-    setAllDevices((prevState: any[]) =>
-      prevState.map((device) =>
-        device.id === deviceId
-          ? { ...device, isFavorite: !device.isFavorite }
-          : device
-      )
-    );
+    setAllDevices((prevDevices: any[]) => {
+      return prevDevices.map((device) => {
+        if (device.id === deviceId) {
+          const updatedDevice = {
+            ...device,
+            isFavorite: !device.isFavorite,
+            favoriteTimestamp: !device.isFavorite ? Date.now() : null, // Add or remove timestamp
+          };
+          return updatedDevice;
+        }
+        return device;
+      });
+    });
   };
 
   return (
-    <View style={[{ borderBottomColor: colorGray, backgroundColor: colorBackground }, styles.container]}>
+    <View style={[{ backgroundColor: colorBackground }, styles.container]}>
       <View style={{ paddingLeft: 10, paddingRight: 10 }}>
         <ThemedText type="subtitle" style={{ fontSize: 14, lineHeight: 16 }}>
           {device.name}
@@ -140,19 +148,23 @@ export default function DeviceCard({
             )}
           </View>
           {device.isFavorite ? (
-            <FontAwesome
-              size={20}
-              name="star"
-              color={colorYellow}
-              onPress={() => toggleFavorite(device.id)}
-            />
+            <TouchableOpacity
+              onPress={() => toggleFavorite(device.id)}>
+                <FontAwesome
+                  size={20}
+                  name="star"
+                  color={colorYellow}
+                />
+              </TouchableOpacity>
           ) : (
-            <FontAwesome6
-              size={20}
-              name="star"
-              color={colorGray}
-              onPress={() => toggleFavorite(device.id)}
-            />
+            <TouchableOpacity
+            onPress={() => toggleFavorite(device.id)}>
+              <FontAwesome6
+                size={20}
+                name="star"
+                color={colorIcon}
+              />
+            </TouchableOpacity>
           )}
         </View>
       </View>
@@ -187,4 +199,5 @@ const styles = StyleSheet.create({
     opacity: 0.5,
     pointerEvents: "none",
   },
+  
 });
