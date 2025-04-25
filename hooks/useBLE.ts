@@ -1,5 +1,5 @@
 /* eslint-disable no-bitwise */
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { PermissionsAndroid, Platform } from "react-native";
 
 import * as ExpoDevice from "expo-device";
@@ -24,7 +24,7 @@ function useBLE() {
   const { allDevices, setAllDevices } = useContext(GlobalContext);
   const [connectedDevice, setConnectedDevice] = useState<Device | null>(null);
   const [bluetoothState, setBluetoothState] = useState<"on" | "off">("off");
-  const { isScanning, setIsScanning } = useContext(GlobalContext);
+  const { isScanning, setIsScanning, setInitialState } = useContext(GlobalContext);
 
   bleManager.onStateChange((state) => {
     if (state === "PoweredOn") {
@@ -212,6 +212,7 @@ function useBLE() {
   };
 
   const scanForPeripherals = () => {
+    
     bleManager.state().then((state) => {
       if (state !== "PoweredOn") {
         console.log("Bluetooth is not enabled, current state:", state);
@@ -219,7 +220,8 @@ function useBLE() {
       }
 
       console.log("Starting device scan...");
-      setIsScanning(true);
+      
+      
       bleManager.startDeviceScan(
         null,
         {
@@ -293,7 +295,7 @@ function useBLE() {
           const now = Date.now();
           return prevState
             .map((device) => {
-              if (now - device.lastUpdated > 10000) {
+              if (now - device.lastUpdated > 30000) {
                 if (device.isFavorite) {
                   // Mark favorite devices as out of range
                   return { ...device, isOutOfRange: true };
@@ -307,7 +309,7 @@ function useBLE() {
             })
             .filter(Boolean); // Remove null entries
         });
-      }, 1000); // Check every second
+      }, 3000); // Check every second
 
       return () => clearInterval(interval); // Cleanup on unmount
     }

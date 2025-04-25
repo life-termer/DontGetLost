@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
   listContainer: {
     minHeight: "100%",
     padding: 16,
-    paddingBottom: 60,
+    paddingBottom: 150,
     marginTop: -1,
   },
   listWrapper: {

@@ -23,8 +23,7 @@ import { ThemedText } from "./ThemedText";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { FontAwesome, FontAwesome6 } from "@expo/vector-icons";
 import { Device } from "react-native-ble-plx";
-
-type Props = PropsWithChildren<{}>;
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export type DeviceCardProps = TextProps & {
   lightColor?: string;
@@ -91,16 +90,18 @@ export default function DeviceCardFavorites({
     }
   };
   const colorRed = useThemeColor({ light: lightColor, dark: darkColor }, "red");
-  const { setAllDevices } = useContext(GlobalContext);
-  const toggleFavorite = (deviceId: string) => {
-    setAllDevices((prevState: any[]) =>
-      prevState.map((device) =>
-        device.id === deviceId
-          ? { ...device, isFavorite: !device.isFavorite }
-          : device
-      )
-    );
+  const { allDevices, setAllDevices, saveFavoriteDevices2, initialState } =
+    useContext(GlobalContext);
+
+  const saveFavoriteDevices = async () => {
+    console.log("Starting saving favorite devices to storage");
+    try {
+      await AsyncStorage.setItem("favoriteDevices", JSON.stringify(allDevices));
+    } catch (error) {
+      console.log("Failed to save favorite devices to storage", error);
+    }
   };
+
   const handleLongPress = () => {
     setIsEditing(true);
     console.log("Long Pressed", device.id);
@@ -111,13 +112,14 @@ export default function DeviceCardFavorites({
   };
 
   const saveCustomName = () => {
-    setAllDevices((prevDevices: any[]) =>
-      prevDevices.map((d) =>
+    setAllDevices((prevDevices: any[]) => {
+      const updatedDevices = prevDevices.map((d) =>
         d.id === device.id ? { ...d, customName: customName } : d
-      )
-    );
+      );
+      saveFavoriteDevices2(updatedDevices);
+      return updatedDevices;
+    });
     setIsEditing(false);
-    // setCustomName('')
   };
 
   const formatDate = (timestamp: number) => {
@@ -131,15 +133,19 @@ export default function DeviceCardFavorites({
   };
 
   return (
-    <TouchableOpacity activeOpacity={.6} onLongPress={handleLongPress}>
-      <View style={[{ backgroundColor: colorBackground}, styles.container]}>
+    <TouchableOpacity activeOpacity={0.6} onLongPress={handleLongPress}>
+      <View style={[{ backgroundColor: colorBackground }, styles.container]}>
         <View style={{ paddingLeft: 10, paddingRight: 10 }}>
           <View style={styles.rowContainer}>
             <View>
               {isEditing ? (
                 <TextInput
                   style={[
-                    { backgroundColor: colorBackground, color: colorText, borderColor: colorIcon },
+                    {
+                      backgroundColor: colorBackground,
+                      color: colorText,
+                      borderColor: colorIcon,
+                    },
                     styles.textInput,
                   ]}
                   value={customName || device.name}
@@ -158,18 +164,17 @@ export default function DeviceCardFavorites({
               <ThemedText style={styles.baseText}>{device.id}</ThemedText>
               {device.customName && (
                 <ThemedText style={styles.baseText}>
-                  Original:{" "}
-                  {device.name}
+                  Original: {device.name}
                 </ThemedText>
               )}
               {device.favoriteTimestamp && (
                 <ThemedText style={styles.baseText}>
-                  Added:{" "}
-                  {formatDate(device.favoriteTimestamp)}
+                  Added: {formatDate(device.favoriteTimestamp)}
                 </ThemedText>
               )}
             </View>
             <View>
+              {initialState ||   
               <View style={styles.columnContainer}>
                 <View
                   style={{
@@ -224,7 +229,7 @@ export default function DeviceCardFavorites({
                     "Distance Unknown"
                   )}
                 </ThemedText>
-              </View>
+              </View>}
             </View>
             {/* {device.isFavorite ? (
             <TouchableOpacity
@@ -257,7 +262,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0,
     paddingTop: 10,
     paddingBottom: 10,
-
   },
 
   rowContainer: {

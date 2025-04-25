@@ -24,7 +24,7 @@ export function ScanControl({
   darkColor,
   ...otherProps
 }: ScanControlProps) {
-  const { isScanning, setIsScanning } = useContext(GlobalContext);
+  const { isScanning, setIsScanning, setInitialState } = useContext(GlobalContext);
 
   const {
     // allDevices,
@@ -54,17 +54,20 @@ export function ScanControl({
   const connect = async (device: any) => {
     connectToDevice(device);
   };
-
+  //TODO: try useCallback to avoid creating new function on every render
   const handleStartScan = () => {
     if (scanForDevices) {
       console.log("Starting scan for devices...");
       scanForDevices();
+      setIsScanning(true);
+      setInitialState(false);
     }
   };
   const handleStopScan = () => {
     if (stopScanForPeripherals) {
       console.log("Scan for devices stopped");
       stopScanForPeripherals();
+      setIsScanning(false);
     }
   };
 

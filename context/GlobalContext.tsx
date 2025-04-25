@@ -10,6 +10,9 @@ export const GlobalContext = createContext<{
   setAllDevices: React.Dispatch<React.SetStateAction<Device[]>>;
   favoriteDevices: any[];
   setFavoriteDevices: (devices: any[]) => void;
+  initialState: boolean;
+  setInitialState: (value: boolean) => void;
+  saveFavoriteDevices2: (devices: any[]) => Promise<void>;
 }>({
   isScanning: false,
   setIsScanning: () => {},
@@ -17,12 +20,29 @@ export const GlobalContext = createContext<{
   setAllDevices: () => {},
   favoriteDevices: [],
   setFavoriteDevices: () => {},
+  initialState: false,
+  setInitialState: () => {},
+  saveFavoriteDevices2: async () => {},
 });
 
 const GlobalProvider = ({ children }: { children: ReactNode }) => {
   const [isScanning, setIsScanning] = useState(false);
   const [allDevices, setAllDevices] = useState<any[]>([]);
   const [favoriteDevices, setFavoriteDevices] = useState<any[]>([]);
+  const [initialState, setInitialState] = useState(true);
+  console.log("initialState", initialState);
+  console.log("isScanning", isScanning);
+  const saveFavoriteDevices2 = async (devices: any[]) => {
+    console.log("Starting saving favorite devices to storage");
+    try {
+      await AsyncStorage.setItem(
+        "favoriteDevices",
+        JSON.stringify(devices)
+      );
+    } catch (error) {
+      console.log("Failed to save favorite devices to storage", error);
+    }
+  };
 
   useEffect(() => {
     const loadFavoriteDevices = async () => {
@@ -30,7 +50,10 @@ const GlobalProvider = ({ children }: { children: ReactNode }) => {
       try {
         const storedFavorites = await AsyncStorage.getItem("favoriteDevices");
         if (storedFavorites) {
-          setFavoriteDevices(JSON.parse(storedFavorites));
+          const parsedFavorites = JSON.parse(storedFavorites);
+          const favorites = parsedFavorites.filter((device:any) => device.isFavorite);
+          console.log("Parsed favorites", favorites);
+          setAllDevices(favorites);
         }
       } catch (error) {
         console.log("Failed to load favorite devices from storage", error);
@@ -39,47 +62,6 @@ const GlobalProvider = ({ children }: { children: ReactNode }) => {
     };
 
     loadFavoriteDevices();
-  }, []);
-
-  useEffect(() => {
-    const saveFavoriteDevices = async () => {
-      console.log("Starting saving favorite devices to storage");
-      try {
-        await AsyncStorage.setItem(
-          "favoriteDevices",
-          JSON.stringify(favoriteDevices)
-        );
-      } catch (error) {
-        console.log("Failed to save favorite devices to storage", error);
-      }
-    };
-
-    saveFavoriteDevices();
-    console.log("favoriteDevices", favoriteDevices);
-  }, [favoriteDevices]);
-
-  useEffect(() => {
-    // Update allDevices with favorite status from loaded favoriteDevices
-    console.log("Starting to update allDevices with favorite status");
-    setAllDevices((prevAllDevices) => {
-      return prevAllDevices.map((device) => {
-        const isFavorite = favoriteDevices.some(
-          (favDevice) => favDevice.id === device.id
-        );
-        return {
-          ...device,
-          isFavorite: isFavorite, // Set isFavorite based on existence in favoriteDevices
-          favoriteTimestamp: isFavorite
-            ? favoriteDevices.find((favDevice) => favDevice.id === device.id)
-                ?.favoriteTimestamp
-            : null, // Set timestamp if it exists
-          customName: isFavorite
-            ? favoriteDevices.find((favDevice) => favDevice.id === device.id)
-                ?.customName
-            : null, // Set customName if it exists
-        };
-      });
-    });
   }, []);
 
   return (
@@ -91,6 +73,9 @@ const GlobalProvider = ({ children }: { children: ReactNode }) => {
         setAllDevices,
         favoriteDevices,
         setFavoriteDevices,
+        initialState,
+        setInitialState,
+        saveFavoriteDevices2
       }}
     >
       {children}

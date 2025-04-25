@@ -16,8 +16,7 @@ import { ThemedText } from "./ThemedText";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { FontAwesome, FontAwesome6 } from "@expo/vector-icons";
 import { Device } from "react-native-ble-plx";
-
-type Props = PropsWithChildren<{}>;
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export type DeviceCardProps = TextProps & {
   lightColor?: string;
@@ -39,7 +38,7 @@ export default function DeviceCard({
   darkColor,
   device,
 }: DeviceCardProps) {
-  const { allDevices, setFavoriteDevices } = useContext(GlobalContext);
+  const { allDevices, saveFavoriteDevices2, initialState } = useContext(GlobalContext);
 
   const colorGreen = useThemeColor(
     { light: lightColor, dark: darkColor },
@@ -76,8 +75,32 @@ export default function DeviceCard({
   };
   const colorRed = useThemeColor({ light: lightColor, dark: darkColor }, "red");
   const { setAllDevices } = useContext(GlobalContext);
-  
+
+  const saveFavoriteDevices = async () => {
+    console.log("Starting saving favorite devices to storage");
+    try {
+      await AsyncStorage.setItem(
+        "favoriteDevices",
+        JSON.stringify(allDevices)
+      );
+    } catch (error) {
+      console.log("Failed to save favorite devices to storage", error);
+    }
+    
+  };
   const toggleFavorite = (deviceId: string) => {
+    setAllDevices((prevState: any[]) => {
+      const updatedDevices = prevState.map((device) =>
+        device.id === deviceId
+          ? { ...device, isFavorite: !device.isFavorite, favoriteTimestamp: !device.isFavorite ? Date.now() : null, }
+          : device
+      );
+      // Save the updated devices after toggling the favorite status
+      saveFavoriteDevices2(updatedDevices);
+      return updatedDevices;
+    });
+  };
+  const toggleFavorite2 = (deviceId: string) => {
     setAllDevices((prevDevices: any[]) => {
       return prevDevices.map((device) => {
         if (device.id === deviceId) {
@@ -91,6 +114,8 @@ export default function DeviceCard({
         return device;
       });
     });
+    console.log("Saved favorite devices to storage", allDevices);
+    saveFavoriteDevices();
   };
 
   return (
@@ -102,6 +127,7 @@ export default function DeviceCard({
         <View style={styles.rowContainer}>
           <View style={styles.baseText}>
             <ThemedText style={styles.baseText}>{device.id}</ThemedText>
+            {initialState || <View>
             {device.isOutOfRange ? (
               <ThemedText style={[{ color: colorRed }, styles.baseText]}>
                 Out of range
@@ -145,7 +171,7 @@ export default function DeviceCard({
                   )}
                 </ThemedText>
               </View>
-            )}
+            )}</View>}
           </View>
           {device.isFavorite ? (
             <TouchableOpacity
