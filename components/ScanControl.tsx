@@ -24,7 +24,8 @@ export function ScanControl({
   darkColor,
   ...otherProps
 }: ScanControlProps) {
-  const { isScanning, setIsScanning, setInitialState } = useContext(GlobalContext);
+  const { isScanning, setIsScanning, setInitialState } =
+    useContext(GlobalContext);
 
   const {
     // allDevices,
@@ -34,6 +35,7 @@ export function ScanControl({
     scanForPeripherals,
     stopScanForPeripherals,
     clearAll,
+    bluetoothState,
   } = useBLE();
   const colorPlay = useThemeColor(
     { light: lightColor, dark: darkColor },
@@ -56,6 +58,7 @@ export function ScanControl({
   };
   //TODO: try useCallback to avoid creating new function on every render
   const handleStartScan = () => {
+    console.log(bluetoothState);
     if (scanForDevices) {
       console.log("Starting scan for devices...");
       scanForDevices();
@@ -72,7 +75,13 @@ export function ScanControl({
   };
 
   return (
-    <ThemedView style={styles.controlsWrapper}>
+    <ThemedView
+      style={[
+        { opacity: bluetoothState === "off" ? 0.4 : 1 },
+        styles.controlsWrapper,
+      ]}
+      pointerEvents={bluetoothState === "off" ? "none" : "auto"}
+    >
       {isScanning ? (
         <>
           <ThemedText style={{ fontSize: 14 }}>Scanning ...</ThemedText>
@@ -104,6 +113,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 12,
     justifyContent: "flex-end",
+    pointerEvents: "auto",
     alignItems: "flex-end",
   },
 });

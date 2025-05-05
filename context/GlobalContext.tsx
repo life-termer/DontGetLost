@@ -13,6 +13,8 @@ export const GlobalContext = createContext<{
   initialState: boolean;
   setInitialState: (value: boolean) => void;
   saveFavoriteDevices2: (devices: any[]) => Promise<void>;
+  sorting: string;
+  setSorting: (value: string) => void;
 }>({
   isScanning: false,
   setIsScanning: () => {},
@@ -23,10 +25,13 @@ export const GlobalContext = createContext<{
   initialState: false,
   setInitialState: () => {},
   saveFavoriteDevices2: async () => {},
+  sorting: "asc",
+  setSorting: () => {},
 });
 
 const GlobalProvider = ({ children }: { children: ReactNode }) => {
   const [isScanning, setIsScanning] = useState(false);
+  const [sorting, setSorting] = useState("asc");
   const [allDevices, setAllDevices] = useState<any[]>([]);
   const [favoriteDevices, setFavoriteDevices] = useState<any[]>([]);
   const [initialState, setInitialState] = useState(true);
@@ -35,10 +40,7 @@ const GlobalProvider = ({ children }: { children: ReactNode }) => {
   const saveFavoriteDevices2 = async (devices: any[]) => {
     console.log("Starting saving favorite devices to storage");
     try {
-      await AsyncStorage.setItem(
-        "favoriteDevices",
-        JSON.stringify(devices)
-      );
+      await AsyncStorage.setItem("favoriteDevices", JSON.stringify(devices));
     } catch (error) {
       console.log("Failed to save favorite devices to storage", error);
     }
@@ -51,8 +53,15 @@ const GlobalProvider = ({ children }: { children: ReactNode }) => {
         const storedFavorites = await AsyncStorage.getItem("favoriteDevices");
         if (storedFavorites) {
           const parsedFavorites = JSON.parse(storedFavorites);
-          const favorites = parsedFavorites.filter((device:any) => device.isFavorite);
+          const favorites = parsedFavorites.filter(
+            (device: any) => device.isFavorite
+          );
           console.log("Parsed favorites", favorites);
+          const updatedFavorites = favorites.map((device: any) => ({
+            ...device,
+            rssi: 0,
+            distance: undefined,
+          }));
           setAllDevices(favorites);
         }
       } catch (error) {
@@ -75,7 +84,9 @@ const GlobalProvider = ({ children }: { children: ReactNode }) => {
         setFavoriteDevices,
         initialState,
         setInitialState,
-        saveFavoriteDevices2
+        saveFavoriteDevices2,
+        sorting,
+        setSorting,
       }}
     >
       {children}

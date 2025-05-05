@@ -38,7 +38,8 @@ export default function DeviceCard({
   darkColor,
   device,
 }: DeviceCardProps) {
-  const { allDevices, saveFavoriteDevices2, initialState } = useContext(GlobalContext);
+  const { allDevices, saveFavoriteDevices2, initialState } =
+    useContext(GlobalContext);
 
   const colorGreen = useThemeColor(
     { light: lightColor, dark: darkColor },
@@ -79,20 +80,20 @@ export default function DeviceCard({
   const saveFavoriteDevices = async () => {
     console.log("Starting saving favorite devices to storage");
     try {
-      await AsyncStorage.setItem(
-        "favoriteDevices",
-        JSON.stringify(allDevices)
-      );
+      await AsyncStorage.setItem("favoriteDevices", JSON.stringify(allDevices));
     } catch (error) {
       console.log("Failed to save favorite devices to storage", error);
     }
-    
   };
   const toggleFavorite = (deviceId: string) => {
     setAllDevices((prevState: any[]) => {
       const updatedDevices = prevState.map((device) =>
         device.id === deviceId
-          ? { ...device, isFavorite: !device.isFavorite, favoriteTimestamp: !device.isFavorite ? Date.now() : null, }
+          ? {
+              ...device,
+              isFavorite: !device.isFavorite,
+              favoriteTimestamp: !device.isFavorite ? Date.now() : null,
+            }
           : device
       );
       // Save the updated devices after toggling the favorite status
@@ -127,69 +128,62 @@ export default function DeviceCard({
         <View style={styles.rowContainer}>
           <View style={styles.baseText}>
             <ThemedText style={styles.baseText}>{device.id}</ThemedText>
-            {initialState || <View>
-            {device.isOutOfRange ? (
-              <ThemedText style={[{ color: colorRed }, styles.baseText]}>
-                Out of range
-              </ThemedText>
-            ) : (
-              <View
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 5,
-                }}
-              >
-                <ThemedText
-                  style={[
-                    { color: colorStatus(device.distance) },
-                    styles.baseText,
-                  ]}
-                >
-                  <FontAwesome6 size={10} name="tower-broadcast" />{" "}
-                  {device.rssi} dBm
-                </ThemedText>
-                <FontAwesome
-                  size={6}
-                  name="circle"
-                  color={colorStatus(device.distance)}
-                />
-                <ThemedText
-                  style={[
-                    { color: colorStatus(device.distance) },
-                    styles.baseText,
-                  ]}
-                >
-                  {device.distance !== undefined ? (
-                    <>
-                      <FontAwesome6 size={10} name="ruler-horizontal" />{" "}
-                      {device.distance.toFixed(2)} m
-                    </>
-                  ) : (
-                    "Distance Unknown"
-                  )}
-                </ThemedText>
+            {initialState || (
+              <View>
+                {device.isOutOfRange ? (
+                  <ThemedText style={[{ color: colorRed }, styles.baseText]}>
+                    Out of range
+                  </ThemedText>
+                ) : (
+                  <View
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 5,
+                    }}
+                  >
+                    <ThemedText
+                      style={[
+                        { color: colorStatus(device.distance) },
+                        styles.baseText,
+                      ]}
+                    >
+                      <FontAwesome6 size={10} name="tower-broadcast" />{" "}
+                      {device.rssi} dBm
+                    </ThemedText>
+                    <FontAwesome
+                      size={6}
+                      name="circle"
+                      color={colorStatus(device.distance)}
+                    />
+                    <ThemedText
+                      style={[
+                        { color: colorStatus(device.distance) },
+                        styles.baseText,
+                      ]}
+                    >
+                      {device.distance !== undefined ? (
+                        <>
+                          <FontAwesome6 size={10} name="ruler-horizontal" />{" "}
+                          {device.distance.toFixed(2)} m
+                        </>
+                      ) : (
+                        "Distance Unknown"
+                      )}
+                    </ThemedText>
+                  </View>
+                )}
               </View>
-            )}</View>}
+            )}
           </View>
           {device.isFavorite ? (
-            <TouchableOpacity
-              onPress={() => toggleFavorite(device.id)}>
-                <FontAwesome
-                  size={20}
-                  name="star"
-                  color={colorYellow}
-                />
-              </TouchableOpacity>
+            <TouchableOpacity>
+              <FontAwesome size={20} name="star" color={colorYellow} />
+            </TouchableOpacity>
           ) : (
-            <TouchableOpacity
-            onPress={() => toggleFavorite(device.id)}>
-              <FontAwesome6
-                size={20}
-                name="star"
-                color={colorIcon}
-              />
+            <TouchableOpacity onPress={() => toggleFavorite(device.id)}>
+              <FontAwesome6 size={20} name="star" color={colorIcon} />
             </TouchableOpacity>
           )}
         </View>
@@ -225,5 +219,4 @@ const styles = StyleSheet.create({
     opacity: 0.5,
     pointerEvents: "none",
   },
-  
 });

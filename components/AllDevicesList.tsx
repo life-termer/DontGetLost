@@ -15,11 +15,11 @@ import { ThemedText } from "./ThemedText";
 import DeviceCard from "./DeviceCard";
 
 export default function AllDevicesList() {
-  const { allDevices } = useContext(GlobalContext);
+  const { allDevices, favoriteDevices } = useContext(GlobalContext);
   //   console.log("AllDevicesList", allDevices);
   return (
     <>
-      {allDevices.length > 0 && (
+      {allDevices.length > 0 && allDevices.length != favoriteDevices.length && (
         <ThemedView style={styles.listContainer}>
           <ThemedText type="title" style={styles.title}>
             All Devices

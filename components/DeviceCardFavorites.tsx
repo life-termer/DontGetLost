@@ -24,6 +24,7 @@ import { useThemeColor } from "@/hooks/useThemeColor";
 import { FontAwesome, FontAwesome6 } from "@expo/vector-icons";
 import { Device } from "react-native-ble-plx";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Swipeable } from "react-native-gesture-handler";
 
 export type DeviceCardProps = TextProps & {
   lightColor?: string;
@@ -77,7 +78,7 @@ export default function DeviceCardFavorites({
 
   const colorStatus = (distance: number | undefined) => {
     if (distance === undefined) {
-      return colorRed;
+      return colorIcon;
     }
     if (distance < 1) {
       return colorGreen;
@@ -90,16 +91,24 @@ export default function DeviceCardFavorites({
     }
   };
   const colorRed = useThemeColor({ light: lightColor, dark: darkColor }, "red");
-  const { allDevices, setAllDevices, saveFavoriteDevices2, initialState } =
+  const { setAllDevices, saveFavoriteDevices2, initialState } =
     useContext(GlobalContext);
 
-  const saveFavoriteDevices = async () => {
-    console.log("Starting saving favorite devices to storage");
-    try {
-      await AsyncStorage.setItem("favoriteDevices", JSON.stringify(allDevices));
-    } catch (error) {
-      console.log("Failed to save favorite devices to storage", error);
-    }
+  const handleDelete = (deviceId: string) => {
+    setAllDevices((prevState: any[]) => {
+      const updatedDevices = prevState.map((device) =>
+        device.id === deviceId
+          ? {
+              ...device,
+              isFavorite: !device.isFavorite,
+              favoriteTimestamp: !device.isFavorite ? Date.now() : null,
+            }
+          : device
+      );
+      // Save the updated devices after toggling the favorite status
+      saveFavoriteDevices2(updatedDevices);
+      return updatedDevices;
+    });
   };
 
   const handleLongPress = () => {
@@ -122,6 +131,15 @@ export default function DeviceCardFavorites({
     setIsEditing(false);
   };
 
+  const renderRightActions = () => (
+    <TouchableOpacity
+      style={[styles.deleteButton, { backgroundColor: colorRed }]}
+      onPress={() => handleDelete(device.id)}
+    >
+      <FontAwesome name="trash" size={20} color="white" />
+    </TouchableOpacity>
+  );
+
   const formatDate = (timestamp: number) => {
     return new Date(timestamp).toLocaleDateString("de-DE", {
       year: "numeric",
@@ -133,105 +151,110 @@ export default function DeviceCardFavorites({
   };
 
   return (
-    <TouchableOpacity activeOpacity={0.6} onLongPress={handleLongPress}>
-      <View style={[{ backgroundColor: colorBackground }, styles.container]}>
-        <View style={{ paddingLeft: 10, paddingRight: 10 }}>
-          <View style={styles.rowContainer}>
-            <View>
-              {isEditing ? (
-                <TextInput
-                  style={[
-                    {
-                      backgroundColor: colorBackground,
-                      color: colorText,
-                      borderColor: colorIcon,
-                    },
-                    styles.textInput,
-                  ]}
-                  value={customName || device.name}
-                  onChangeText={handleNameChange}
-                  onBlur={saveCustomName}
-                  autoFocus
-                />
-              ) : (
-                <ThemedText
-                  type="subtitle"
-                  style={{ fontSize: 14, lineHeight: 16 }}
-                >
-                  {device.customName || device.customName || device.name}
-                </ThemedText>
-              )}
-              <ThemedText style={styles.baseText}>{device.id}</ThemedText>
-              {device.customName && (
-                <ThemedText style={styles.baseText}>
-                  Original: {device.name}
-                </ThemedText>
-              )}
-              {device.favoriteTimestamp && (
-                <ThemedText style={styles.baseText}>
-                  Added: {formatDate(device.favoriteTimestamp)}
-                </ThemedText>
-              )}
-            </View>
-            <View>
-              {initialState ||   
-              <View style={styles.columnContainer}>
-                <View
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    gap: 5,
-                    alignItems: "center",
-                  }}
-                >
-                  <FontAwesome
-                    size={9}
-                    name="circle"
-                    color={colorStatus(
-                      device.isOutOfRange ? undefined : device.distance
-                    )}
-                  />
-                  <ThemedText
+    <Swipeable renderRightActions={renderRightActions}>
+      <TouchableOpacity activeOpacity={0.6} onLongPress={handleLongPress}>
+        <View style={[{ backgroundColor: colorBackground }, styles.container]}>
+          <View style={{ paddingLeft: 10, paddingRight: 10 }}>
+            <View style={styles.rowContainer}>
+              <View>
+                {isEditing ? (
+                  <TextInput
                     style={[
                       {
-                        color: colorStatus(
-                          device.isOutOfRange ? undefined : device.distance
-                        ),
+                        backgroundColor: colorBackground,
+                        color: colorText,
+                        borderColor: colorIcon,
                       },
-                      styles.baseText,
+                      styles.textInput,
                     ]}
+                    value={customName || device.name}
+                    onChangeText={handleNameChange}
+                    onBlur={saveCustomName}
+                    autoFocus
+                  />
+                ) : (
+                  <ThemedText
+                    type="subtitle"
+                    style={{ fontSize: 14, lineHeight: 16 }}
                   >
-                    {device.isOutOfRange ? "Out of range" : "In range"}
+                    {device.customName || device.customName || device.name}
                   </ThemedText>
-                </View>
-                <ThemedText
-                  style={[
-                    { color: colorStatus(device.distance) },
-                    styles.baseText,
-                  ]}
-                >
-                  <FontAwesome6 size={10} name="tower-broadcast" />{" "}
-                  {device.isOutOfRange ? "0" : device.rssi} dBm
-                </ThemedText>
+                )}
+                <ThemedText style={styles.baseText}>{device.id}</ThemedText>
+                {device.customName && (
+                  <ThemedText style={styles.baseText}>
+                    Original: {device.name}
+                  </ThemedText>
+                )}
+                {device.favoriteTimestamp && (
+                  <ThemedText style={styles.baseText}>
+                    Added: {formatDate(device.favoriteTimestamp)}
+                  </ThemedText>
+                )}
+              </View>
+              <View>
+                {initialState || (
+                  <View style={styles.columnContainer}>
+                    <View
+                      style={{
+                        display: "flex",
+                        flexDirection: "row",
+                        gap: 5,
+                        alignItems: "center",
+                      }}
+                    >
+                      <FontAwesome
+                        size={9}
+                        name="circle"
+                        color={colorStatus(
+                          device.isOutOfRange ? undefined : device.distance
+                        )}
+                      />
+                      <ThemedText
+                        style={[
+                          {
+                            color: colorStatus(
+                              device.isOutOfRange ? undefined : device.distance
+                            ),
+                          },
+                          styles.baseText,
+                        ]}
+                      >
+                        {device.isOutOfRange ? "Out of range" : "In range"}
+                      </ThemedText>
+                    </View>
+                    <ThemedText
+                      style={[
+                        { color: colorStatus(device.distance) },
+                        styles.baseText,
+                      ]}
+                    >
+                      <FontAwesome6 size={10} name="tower-broadcast" />{" "}
+                      {device.isOutOfRange ? "-" : device.rssi} dBm
+                    </ThemedText>
 
-                <ThemedText
-                  style={[
-                    { color: colorStatus(device.distance) },
-                    styles.baseText,
-                  ]}
-                >
-                  {device.distance !== undefined ? (
-                    <>
-                      <FontAwesome6 size={10} name="ruler-horizontal" />{" "}
-                      {device.isOutOfRange ? "0" : device.distance.toFixed(2)} m
-                    </>
-                  ) : (
-                    "Distance Unknown"
-                  )}
-                </ThemedText>
-              </View>}
-            </View>
-            {/* {device.isFavorite ? (
+                    <ThemedText
+                      style={[
+                        { color: colorStatus(device.distance) },
+                        styles.baseText,
+                      ]}
+                    >
+                      {device.distance !== undefined ? (
+                        <>
+                          <FontAwesome6 size={10} name="ruler-horizontal" />{" "}
+                          {device.isOutOfRange
+                            ? "-"
+                            : device.distance.toFixed(2)}{" "}
+                          m
+                        </>
+                      ) : (
+                        "Distance Unknown"
+                      )}
+                    </ThemedText>
+                  </View>
+                )}
+              </View>
+              {/* {device.isFavorite ? (
             <TouchableOpacity
               onPress={() => toggleFavorite(device.id)}>
                 <FontAwesome
@@ -250,10 +273,11 @@ export default function DeviceCardFavorites({
               />
             </TouchableOpacity>
           )} */}
+            </View>
           </View>
         </View>
-      </View>
-    </TouchableOpacity>
+      </TouchableOpacity>
+    </Swipeable>
   );
 }
 
@@ -293,5 +317,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 2,
     fontSize: 14,
+  },
+  deleteButton: {
+    justifyContent: "center",
+    alignItems: "center",
+    width: 75,
   },
 });

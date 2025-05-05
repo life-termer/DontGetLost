@@ -24,7 +24,8 @@ function useBLE() {
   const { allDevices, setAllDevices } = useContext(GlobalContext);
   const [connectedDevice, setConnectedDevice] = useState<Device | null>(null);
   const [bluetoothState, setBluetoothState] = useState<"on" | "off">("off");
-  const { isScanning, setIsScanning, setInitialState } = useContext(GlobalContext);
+  const { isScanning, setIsScanning, setInitialState } =
+    useContext(GlobalContext);
 
   bleManager.onStateChange((state) => {
     if (state === "PoweredOn") {
@@ -212,7 +213,6 @@ function useBLE() {
   };
 
   const scanForPeripherals = () => {
-    
     bleManager.state().then((state) => {
       if (state !== "PoweredOn") {
         console.log("Bluetooth is not enabled, current state:", state);
@@ -220,8 +220,7 @@ function useBLE() {
       }
 
       console.log("Starting device scan...");
-      
-      
+
       bleManager.startDeviceScan(
         null,
         {
@@ -264,8 +263,7 @@ function useBLE() {
                 lastUpdated: Date.now(), // Add a timestamp for the last update
                 isFavorite: prevState[existingIndex]?.isFavorite || false, // Preserve favorite status
                 isOutOfRange: false, // Reset out-of-range status when the device is updated
-                customName:
-                  prevState[existingIndex]?.customName || undefined, // Preserve customName
+                customName: prevState[existingIndex]?.customName || undefined, // Preserve customName
                 favoriteTimestamp:
                   prevState[existingIndex]?.favoriteTimestamp || undefined, // Preserve favoriteTimestamp
               };
@@ -298,7 +296,12 @@ function useBLE() {
               if (now - device.lastUpdated > 30000) {
                 if (device.isFavorite) {
                   // Mark favorite devices as out of range
-                  return { ...device, isOutOfRange: true };
+                  return {
+                    ...device,
+                    isOutOfRange: true,
+                    distance: undefined,
+                    rssi: undefined,
+                  };
                 } else {
                   // Remove non-favorite devices
                   return null;

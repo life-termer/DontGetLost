@@ -2,6 +2,8 @@ import { ScrollView, useColorScheme, View } from "react-native";
 import SubHeader from "@/components/SubHeader";
 import FavoriteDevicesList from "@/components/FavoriteDevicesList";
 import { Colors } from "@/constants/Colors";
+import { SortingButton } from "@/components/SortingButton";
+import SortOptions from "@/components/SortOptions";
 
 export default function FavoritesScreen() {
   const colorScheme = useColorScheme();
@@ -15,6 +17,8 @@ export default function FavoritesScreen() {
     >
       <SubHeader />
       <ScrollView>
+        {/* TODO: Add sorting and filtering options */}
+        <SortOptions />
         <FavoriteDevicesList tab={"favorites"} />
       </ScrollView>
     </View>
