@@ -73,9 +73,9 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="settings"
+          name="map"
           options={{
-            title: "Settings",
+            title: "Map View",
             headerStyle: {
               backgroundColor: Colors[colorScheme ?? "light"].backgroundLight,
               boxShadow: "0px 0px 0px #000",
@@ -90,7 +90,7 @@ export default function TabLayout() {
               fontFamily: "MontserratBold",
             },
             tabBarIcon: ({ color }) => (
-              <FontAwesome size={28} name="cog" color={color} />
+              <FontAwesome6 size={28} name="map" color={color} />
             ),
           }}
         />

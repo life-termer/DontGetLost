@@ -7,6 +7,8 @@ import {
 } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { Colors } from "@/constants/Colors";
+import MapView from "@/components/MapView";
+import SubHeader from "@/components/SubHeader";
 
 export default function SettingsScreen() {
   const colorScheme = useColorScheme();
@@ -18,7 +20,8 @@ export default function SettingsScreen() {
         minHeight: "100%",
       }}
     >
-      <ThemedText></ThemedText>
+      <SubHeader />
+      <MapView />
     </View>
   );
 }

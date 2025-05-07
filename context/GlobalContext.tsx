@@ -35,8 +35,6 @@ const GlobalProvider = ({ children }: { children: ReactNode }) => {
   const [allDevices, setAllDevices] = useState<any[]>([]);
   const [favoriteDevices, setFavoriteDevices] = useState<any[]>([]);
   const [initialState, setInitialState] = useState(true);
-  console.log("initialState", initialState);
-  console.log("isScanning", isScanning);
   const saveFavoriteDevices2 = async (devices: any[]) => {
     console.log("Starting saving favorite devices to storage");
     try {

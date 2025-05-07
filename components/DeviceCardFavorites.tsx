@@ -80,14 +80,12 @@ export default function DeviceCardFavorites({
     if (distance === undefined) {
       return colorIcon;
     }
-    if (distance < 1) {
+    if (distance < 5) {
       return colorGreen;
-    } else if (distance < 4) {
-      return colorYellow;
-    } else if (distance < 4) {
-      return colorYellow;
-    } else {
+    } else if (distance < 50) {
       return colorBlue;
+    } else {
+      return colorYellow;
     }
   };
   const colorRed = useThemeColor({ light: lightColor, dark: darkColor }, "red");

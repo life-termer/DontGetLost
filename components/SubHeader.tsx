@@ -25,6 +25,8 @@ export default function SubHeader() {
 
 const styles = StyleSheet.create({
   titleContainer: {
+    position: "relative",
+    zIndex: 10000,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",

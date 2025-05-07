@@ -47,7 +47,7 @@ export default function HomeScreen() {
     <View style={{ backgroundColor:  Colors[colorScheme ?? "light"].background, minHeight: "100%" }}>
       <SubHeader />
       <ScrollView>
-        <FavoriteDevicesList tab="index" />
+        {/* <FavoriteDevicesList tab="index" /> */}
         <AllDevicesList />
       </ScrollView>
       </View>

@@ -21,14 +21,19 @@ export default function AllDevicesList() {
     <>
       {allDevices.length > 0 && allDevices.length != favoriteDevices.length && (
         <ThemedView style={styles.listContainer}>
-          <ThemedText type="title" style={styles.title}>
+          {/* <ThemedText type="title" style={styles.title}>
             All Devices
-          </ThemedText>
+          </ThemedText> */}
           <ThemedView style={styles.listWrapper}>
-            {allDevices.map((device: any) => {
+            {/* {allDevices.map((device: any) => {
               return device.isFavorite === false ? (
                 <DeviceCard device={device} key={device.id} />
               ) : null;
+            })} */}
+            {allDevices.map((device: any) => {
+              return  (
+                <DeviceCard device={device} key={device.id} />
+              ) 
             })}
           </ThemedView>
         </ThemedView>
@@ -42,14 +47,11 @@ const styles = StyleSheet.create({
     minHeight: "100%",
     padding: 16,
     paddingBottom: 150,
-    marginTop: -1,
   },
   listWrapper: {
-    borderRadius: 12,
     display: "flex",
     flexDirection: "column",
-    gap: 1,
-    overflow: "hidden",
+    gap: 10,
   },
   title: {
     paddingLeft: 10,

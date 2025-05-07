@@ -293,7 +293,7 @@ function useBLE() {
           const now = Date.now();
           return prevState
             .map((device) => {
-              if (now - device.lastUpdated > 30000) {
+              if (now - device.lastUpdated > 120000) {
                 if (device.isFavorite) {
                   // Mark favorite devices as out of range
                   return {

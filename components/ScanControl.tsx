@@ -58,7 +58,6 @@ export function ScanControl({
   };
   //TODO: try useCallback to avoid creating new function on every render
   const handleStartScan = () => {
-    console.log(bluetoothState);
     if (scanForDevices) {
       console.log("Starting scan for devices...");
       scanForDevices();
