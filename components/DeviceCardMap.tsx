@@ -54,7 +54,7 @@ export default function DeviceCardMap({
   x,
   y,
 }: DeviceCardProps) {
-  const { allDevices, saveFavoriteDevices2, initialState } =
+  const { setIsModalVisible, setCurrentDevice } =
     useContext(GlobalContext);
   const colorScheme = useColorScheme();
 
@@ -90,7 +90,10 @@ export default function DeviceCardMap({
     { light: lightColor, dark: darkColor },
     "backgroundLight"
   );
-
+  const showModal = () => {
+    setCurrentDevice(device.id);
+    setIsModalVisible(true);
+  };
   const colorStatus = (distance: number | undefined) => {
     if (distance === undefined) {
       return colorIcon;
@@ -127,6 +130,7 @@ export default function DeviceCardMap({
   return (
     <>
       <View
+      
         style={{
           position: "absolute",
           left: lineX,
@@ -174,7 +178,8 @@ export default function DeviceCardMap({
         </ThemedText>
       </View>
 
-      <View
+      <TouchableOpacity
+        onPress={showModal}
         key={device.id}
         style={[
           {
@@ -195,7 +200,7 @@ export default function DeviceCardMap({
         {/* <ThemedText style={styles.baseText}>
         {device.distance?.toFixed(2)}m
       </ThemedText> */}
-      </View>
+      </TouchableOpacity>
     </>
   );
 }
@@ -208,7 +213,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     zIndex: 100,
     padding: 3,
-    
   },
   titleText: {
     fontSize: 11,

@@ -1,16 +1,11 @@
-import { useContext, type PropsWithChildren, type ReactElement } from "react";
+import { useContext } from "react";
 import {
-  Platform,
-  ScrollView,
   StyleSheet,
   type TextProps,
   TouchableOpacity,
   View,
 } from "react-native";
 
-import { ThemedView } from "@/components/ThemedView";
-import { useBottomTabOverflow } from "@/components/ui/TabBarBackground";
-import { useColorScheme } from "@/hooks/useColorScheme";
 import { GlobalContext } from "@/context/GlobalContext";
 import { ThemedText } from "./ThemedText";
 import { useThemeColor } from "@/hooks/useThemeColor";
@@ -19,8 +14,8 @@ import DistanceBar from "./DistanceBar";
 import Octicons from "@expo/vector-icons/Octicons";
 import Feather from "@expo/vector-icons/Feather";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import { Device } from "react-native-ble-plx";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import ToggleFavorites from "./ToggleFavorites";
+import DeviceName from "./DeviceName";
 
 export type DeviceCardProps = TextProps & {
   lightColor?: string;
@@ -43,9 +38,8 @@ export default function DeviceCard({
   darkColor,
   device,
 }: DeviceCardProps) {
-  const { allDevices, saveFavoriteDevices2, initialState, isScanning } =
+  const { isScanning, setIsModalVisible, setCurrentDevice } =
     useContext(GlobalContext);
-
   const colorGreen = useThemeColor(
     { light: lightColor, dark: darkColor },
     "green"
@@ -88,23 +82,10 @@ export default function DeviceCard({
     }
   };
   const colorRed = useThemeColor({ light: lightColor, dark: darkColor }, "red");
-  const { setAllDevices } = useContext(GlobalContext);
 
-  const toggleFavorite = (deviceId: string) => {
-    setAllDevices((prevState: any[]) => {
-      const updatedDevices = prevState.map((device) =>
-        device.id === deviceId
-          ? {
-              ...device,
-              isFavorite: !device.isFavorite,
-              favoriteTimestamp: !device.isFavorite ? Date.now() : null,
-            }
-          : device
-      );
-      // Save the updated devices after toggling the favorite status
-      saveFavoriteDevices2(updatedDevices);
-      return updatedDevices;
-    });
+  const showModal = () => {
+    setCurrentDevice(device.id);
+    setIsModalVisible(true);
   };
 
   return (
@@ -121,33 +102,20 @@ export default function DeviceCard({
             size={16}
             color={colorStatus(device.distance)}
           />
-          <ThemedText
+          {/* <ThemedText
             type="subtitle"
             style={{ fontSize: 15, lineHeight: 16, marginEnd: 5 }}
           >
             {device.customName || device.name}
           </ThemedText>
-          <Octicons name="pencil" size={15} color="black" />
+          <Octicons name="pencil" size={15} color="black" /> */}
+          <DeviceName device={device} />
         </View>
         <View style={[{ gap: 20 }, styles.rowContainer]}>
-          <TouchableOpacity>
-            <FontAwesome size={20} name="info" color={colorIcon} />
+          <TouchableOpacity onPress={showModal} style={{ paddingHorizontal: 10 }}>
+            <FontAwesome size={20} name="info" color={colorIcon}  />
           </TouchableOpacity>
-          {device.isFavorite ? (
-            <TouchableOpacity
-              onPress={() => toggleFavorite(device.id)}
-              style={{ width: 22, height: 22 }}
-            >
-              <FontAwesome size={22} name="star" color={colorYellow} />
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity
-              onPress={() => toggleFavorite(device.id)}
-              style={{ width: 22, height: 22 }}
-            >
-              <FontAwesome6 size={20} name="star" color={colorIcon} />
-            </TouchableOpacity>
-          )}
+          <ToggleFavorites device={device} />
         </View>
       </View>
       <View style={styles.rowContainer}>
@@ -155,54 +123,6 @@ export default function DeviceCard({
           <ThemedText style={[{ marginBottom: 10 }, styles.baseText]}>
             {device.id}
           </ThemedText>
-          {/* {initialState || (
-            <View>
-              {device.isOutOfRange ? (
-                <ThemedText style={[{ color: colorRed }, styles.baseText]}>
-                  Out of range
-                </ThemedText>
-              ) : (
-                <View
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    alignItems: "center",
-                    gap: 5,
-                  }}
-                >
-                  <ThemedText
-                    style={[
-                      { color: colorStatus(device.distance) },
-                      styles.baseText,
-                    ]}
-                  >
-                    <FontAwesome6 size={10} name="tower-broadcast" />{" "}
-                    {device.rssi} dBm
-                  </ThemedText>
-                  <FontAwesome
-                    size={6}
-                    name="circle"
-                    color={colorStatus(device.distance)}
-                  />
-                  <ThemedText
-                    style={[
-                      { color: colorStatus(device.distance) },
-                      styles.baseText,
-                    ]}
-                  >
-                    {device.distance !== undefined ? (
-                      <>
-                        <FontAwesome6 size={10} name="ruler-horizontal" />{" "}
-                        {device.distance.toFixed(2)} m
-                      </>
-                    ) : (
-                      "Distance Unknown"
-                    )}
-                  </ThemedText>
-                </View>
-              )}
-            </View>
-          )} */}
           <View style={[{justifyContent: "space-between", width: "100%"},styles.rowContainer]}>
             <View
               style={[
@@ -240,7 +160,6 @@ export default function DeviceCard({
 
 const styles = StyleSheet.create({
   container: {
-    // backgroundColor: "#fff",
     padding: 10,
     borderWidth: 1,
     borderRadius: 10,

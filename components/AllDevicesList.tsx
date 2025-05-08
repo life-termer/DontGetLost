@@ -13,31 +13,26 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { GlobalContext } from "@/context/GlobalContext";
 import { ThemedText } from "./ThemedText";
 import DeviceCard from "./DeviceCard";
+import ModalInfo from "./ModalInfo";
 
 export default function AllDevicesList() {
-  const { allDevices, favoriteDevices } = useContext(GlobalContext);
+  const { allDevices, favoriteDevices, currentDevice } = useContext(GlobalContext);
   //   console.log("AllDevicesList", allDevices);
+  const device = allDevices.find((device: any) => device.id === currentDevice)
   return (
     <>
-      {allDevices.length > 0 && allDevices.length != favoriteDevices.length && (
+      {allDevices.length > 0 ? (
         <ThemedView style={styles.listContainer}>
-          {/* <ThemedText type="title" style={styles.title}>
-            All Devices
-          </ThemedText> */}
           <ThemedView style={styles.listWrapper}>
-            {/* {allDevices.map((device: any) => {
-              return device.isFavorite === false ? (
-                <DeviceCard device={device} key={device.id} />
-              ) : null;
-            })} */}
             {allDevices.map((device: any) => {
               return  (
                 <DeviceCard device={device} key={device.id} />
               ) 
             })}
           </ThemedView>
+          {device && <ModalInfo device={device} />}
         </ThemedView>
-      )}
+      ) : <View />}
     </>
   );
 }

@@ -15,6 +15,10 @@ export const GlobalContext = createContext<{
   saveFavoriteDevices2: (devices: any[]) => Promise<void>;
   sorting: string;
   setSorting: (value: string) => void;
+  isModalVisible: boolean;
+  setIsModalVisible: (value: boolean) => void;
+  currentDevice: any;
+  setCurrentDevice: (value: any) => void;
 }>({
   isScanning: false,
   setIsScanning: () => {},
@@ -27,6 +31,10 @@ export const GlobalContext = createContext<{
   saveFavoriteDevices2: async () => {},
   sorting: "asc",
   setSorting: () => {},
+  isModalVisible: false,
+  setIsModalVisible: () => {},
+  currentDevice: null,
+  setCurrentDevice: () => {},
 });
 
 const GlobalProvider = ({ children }: { children: ReactNode }) => {
@@ -35,6 +43,8 @@ const GlobalProvider = ({ children }: { children: ReactNode }) => {
   const [allDevices, setAllDevices] = useState<any[]>([]);
   const [favoriteDevices, setFavoriteDevices] = useState<any[]>([]);
   const [initialState, setInitialState] = useState(true);
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+  const [currentDevice, setCurrentDevice] = useState<any>(null);
   const saveFavoriteDevices2 = async (devices: any[]) => {
     console.log("Starting saving favorite devices to storage");
     try {
@@ -85,6 +95,10 @@ const GlobalProvider = ({ children }: { children: ReactNode }) => {
         saveFavoriteDevices2,
         sorting,
         setSorting,
+        isModalVisible,
+        setIsModalVisible,
+        currentDevice,
+        setCurrentDevice
       }}
     >
       {children}

@@ -1,5 +1,5 @@
 import { useContext, useEffect } from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { ThemedView } from "@/components/ThemedView";
 import { GlobalContext } from "@/context/GlobalContext";
@@ -37,29 +37,16 @@ export default function FavoriteDevicesList({
   }, [allDevices, setFavoriteDevices, sorting]);
   return (
     <>
-      {favoriteDevices.length > 0 && (
-        <ThemedView
-          style={[
-            {
-              paddingBottom: tab === "favorites" ? 32 : 0,
-              marginBottom: tab === "favorites" ? 150 : 0,
-            },
-            styles.listContainer,
-          ]}
-        >
-          <ThemedText type="title" style={styles.title}>
-            Favorite Devices
-          </ThemedText>
+      {favoriteDevices.length > 0 ? (
+        <ThemedView style={styles.listContainer}>
           <ThemedView style={styles.listWrapper}>
-            {favoriteDevices.map((device: any) => {
-              return tab === "favorites" ? (
-                <DeviceCardFavorites device={device} key={device.id} />
-              ) : (
-                <DeviceCard device={device} key={device.id} />
-              );
-            })}
+            {favoriteDevices.map((device: any) => (
+              <DeviceCard device={device} key={device.id} />
+            ))}
           </ThemedView>
         </ThemedView>
+      ) : (
+        <View />
       )}
     </>
   );
@@ -68,13 +55,12 @@ export default function FavoriteDevicesList({
 const styles = StyleSheet.create({
   listContainer: {
     padding: 16,
+    paddingBottom: 150,
   },
   listWrapper: {
-    borderRadius: 12,
     display: "flex",
     flexDirection: "column",
-    gap: 1,
-    overflow: "hidden",
+    gap: 10,
   },
   title: {
     paddingLeft: 10,

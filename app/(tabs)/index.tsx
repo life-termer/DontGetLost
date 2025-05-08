@@ -7,6 +7,7 @@ import { GlobalContext } from "@/context/GlobalContext";
 import AllDevicesList from "@/components/AllDevicesList";
 import FavoriteDevicesList from "@/components/FavoriteDevicesList";
 import { Colors }from "@/constants/Colors";
+import ModalInfo from "@/components/ModalInfo";
 
 export default function HomeScreen() {
   const {
@@ -22,7 +23,6 @@ export default function HomeScreen() {
 
   const colorScheme = useColorScheme();
 
-  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   interface UserInt {
     name: string;
     email: string;

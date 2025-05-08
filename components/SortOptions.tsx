@@ -26,20 +26,20 @@ export type SortOptions = TextProps & {
 };
 
 export default function SortOptions({ lightColor, darkColor }: SortOptions) {
-  const { allDevices, saveFavoriteDevices2, initialState } =
+  const { favoriteDevices } =
     useContext(GlobalContext);
 
-  const colorGreen = useThemeColor(
+  const colorGreenAlpha2 = useThemeColor(
     { light: lightColor, dark: darkColor },
-    "green"
+    "greenAlpha2"
   );
-  const colorYellow = useThemeColor(
+  const colorYellowAlpha2 = useThemeColor(
     { light: lightColor, dark: darkColor },
-    "yellow"
+    "yellowAlpha2"
   );
-  const colorBlue = useThemeColor(
+  const colorRedAlpha2 = useThemeColor(
     { light: lightColor, dark: darkColor },
-    "blue"
+    "redAlpha2"
   );
   const colorIcon = useThemeColor(
     { light: lightColor, dark: darkColor },
@@ -52,27 +52,38 @@ export default function SortOptions({ lightColor, darkColor }: SortOptions) {
 
   const colorRed = useThemeColor({ light: lightColor, dark: darkColor }, "red");
 
+  const nearbyDevices = (devices: any) => {
+    const lengthAll = devices.length;
+    const nearbyDevices = devices.filter((device: any) => device.distance <= 5);
+    const inProximityDevices = devices.filter(
+      (device: any) => device.distance <= 50
+    );
+    if (lengthAll === nearbyDevices.length)
+      return 'all';
+    else if (inProximityDevices.length)
+      return 'some';
+    else return 'none';
+  };
+
+  const status = nearbyDevices(favoriteDevices);
   return (
     <ThemedView style={styles.listContainer}>
-      <ThemedText type="title" style={styles.title}>
-        Sort Options
-      </ThemedText>
       <ThemedView style={styles.listWrapper}>
         <View
           style={[
-            { backgroundColor: colorBackground, marginBottom: 1 },
+            { backgroundColor: status === 'all' ? colorGreenAlpha2 : status === 'some' ? colorYellowAlpha2 : colorRedAlpha2, marginBottom: 1 },
             styles.container,
           ]}
         >
           <View style={{ paddingLeft: 10, paddingRight: 10 }}>
-            <FavoritesStats />
+            <FavoritesStats status={status}/>
           </View>
         </View>
-        <View style={[{ backgroundColor: colorBackground, marginBottom: 1 }]}>
+        {/* <View style={[{ backgroundColor: colorBackground, marginBottom: 1 }]}>
           <View style={{ paddingLeft: 10, paddingRight: 10 }}>
             <SortingButton />
           </View>
-        </View>
+        </View> */}
       </ThemedView>
     </ThemedView>
   );
@@ -80,13 +91,16 @@ export default function SortOptions({ lightColor, darkColor }: SortOptions) {
 
 const styles = StyleSheet.create({
   container: {
-    borderBottomWidth: 0,
     paddingTop: 10,
     paddingBottom: 10,
+    borderRadius: 10,
   },
-
   rowContainer: {
     flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  columnContainer: {
+    flexDirection: "column",
     justifyContent: "space-between",
   },
   stepContainer: {
@@ -97,7 +111,6 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   listWrapper: {
-    borderRadius: 12,
     display: "flex",
     flexDirection: "column",
     gap: 1,

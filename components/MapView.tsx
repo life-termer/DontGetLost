@@ -37,15 +37,15 @@ export default function MapView({ lightColor, darkColor }: MapViewProps) {
     const lengthAll = devices.length;
     const nearbyDevices = devices.filter((device: any) => device.distance <= 5);
     const inProximityDevices = devices.filter(
-      (device: any) => device.distance > 5 && device.distance <= 50
+      (device: any) => device.distance <= 50
     );
     if (lengthAll === nearbyDevices.length)
       return Colors[colorScheme ?? "light"].greenAlpha2;
-    else if (nearbyDevices.length || inProximityDevices)
+    else if (inProximityDevices.length)
       return Colors[colorScheme ?? "light"].yellowAlpha;
     else return Colors[colorScheme ?? "light"].redAlpha2;
   };
-
+  
   const offlineDevices = favoriteDevices.filter(
     (device: any) => device.isOutOfRange
   );
@@ -61,14 +61,14 @@ export default function MapView({ lightColor, darkColor }: MapViewProps) {
         position: "relative",
       }}
     >
-      {favoriteDevices.length && (
+      {favoriteDevices.length ? (
         <View
           style={[
             { backgroundColor: nearbyDevices(favoriteDevices) },
             styles.overlay,
           ]}
         ></View>
-      )}
+      ) : <View />}
       <LegendMap />
       {offlineDevices.length ? <OfflineDevicesMap offlineDevices={offlineDevices} /> : null}
       <View

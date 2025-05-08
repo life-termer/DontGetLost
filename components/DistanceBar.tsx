@@ -76,7 +76,7 @@ export default function DistanceBar({
         <View
           style={[
             styles.barFill,
-            { width: fillWidth, backgroundColor: colorStatus(device.distance) },
+            { width: device.distance ? `${fillPercentage * 100}%` : 0, backgroundColor: colorStatus(device.distance) },
           ]}
         />
       </View>
