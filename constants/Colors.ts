@@ -29,6 +29,7 @@ export const Colors = {
     blue: "#0284c7",
     blueAlpha: "rgba(2, 132, 199, 0.3)",
     red: "#9f1239",
+    redAlpha: "rgba(159, 18, 57, 0.3)",
     redAlpha2: "rgba(159, 18, 57, 0.2)",
     green: "#15803d",
     greenAlpha: "rgba(21, 128, 61, 0.3)",
@@ -41,6 +42,7 @@ export const Colors = {
     tabIconDefault: gray600,
     tabIconSelected: tintColorLight,
     overlay: "#00000040",
+    overlayLight: "#ffffffbe",
   },
   dark: {
     text: gray100,
@@ -50,6 +52,7 @@ export const Colors = {
     blue: "#38bdf8",
     blueAlpha: "rgba(56, 189, 248, 0.3)",
     red: "#be123c",
+    redAlpha: "rgba(190, 18, 60, 0.3)",
     redAlpha2: "rgba(190, 18, 60, 0.2)",
     green: "#22c55e",
     greenAlpha: "rgba(34, 197, 94, 0.3)",
@@ -62,5 +65,6 @@ export const Colors = {
     tabIconDefault: gray500,
     tabIconSelected: tintColorDark,
     overlay: "#000000b5",
+    overlayLight: "#313131ce",
   },
 };

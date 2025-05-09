@@ -1,6 +1,7 @@
 import { createContext, useState, useEffect } from "react";
 import { ReactNode } from "react";
 import { Device } from "react-native-ble-plx";
+import * as Location from "expo-location"
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const GlobalContext = createContext<{
@@ -19,6 +20,10 @@ export const GlobalContext = createContext<{
   setIsModalVisible: (value: boolean) => void;
   currentDevice: any;
   setCurrentDevice: (value: any) => void;
+  search: string,
+  setSearch: (value: string) => void;
+  location: Location.LocationObject | null;
+  setLocation: (value: Location.LocationObject) => void;
 }>({
   isScanning: false,
   setIsScanning: () => {},
@@ -35,16 +40,25 @@ export const GlobalContext = createContext<{
   setIsModalVisible: () => {},
   currentDevice: null,
   setCurrentDevice: () => {},
+  search: "",
+  setSearch: () => {},
+  location: null,
+  setLocation:  () => {},
+
 });
 
 const GlobalProvider = ({ children }: { children: ReactNode }) => {
   const [isScanning, setIsScanning] = useState(false);
   const [sorting, setSorting] = useState("asc");
+  const [search, setSearch] = useState("");
   const [allDevices, setAllDevices] = useState<any[]>([]);
   const [favoriteDevices, setFavoriteDevices] = useState<any[]>([]);
   const [initialState, setInitialState] = useState(true);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const [currentDevice, setCurrentDevice] = useState<any>(null);
+  const [location, setLocation] = useState<Location.LocationObject | null>(
+    null
+  );
   const saveFavoriteDevices2 = async (devices: any[]) => {
     console.log("Starting saving favorite devices to storage");
     try {
@@ -98,7 +112,11 @@ const GlobalProvider = ({ children }: { children: ReactNode }) => {
         isModalVisible,
         setIsModalVisible,
         currentDevice,
-        setCurrentDevice
+        setCurrentDevice,
+        search,
+        setSearch,
+        location,
+        setLocation
       }}
     >
       {children}

@@ -3,45 +3,53 @@ import {
   type TextProps,
   StyleSheet,
   TouchableHighlight,
+  TouchableOpacity,
 } from "react-native";
 
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { ThemedView } from "./ThemedView";
-import { FontAwesome, FontAwesome6 } from "@expo/vector-icons";
+import Feather from '@expo/vector-icons/Feather';
 import { useContext } from "react";
 import { GlobalContext } from "@/context/GlobalContext";
 import { ThemedText } from "./ThemedText";
+import Ionicons from '@expo/vector-icons/Ionicons';
 import useBLE from "@/hooks/useBLE";
 
 export type ScanControlProps = TextProps & {
   lightColor?: string;
   darkColor?: string;
+  tab?: string;
 };
 
-export function ScanControl({
+export function ScanBtn({
   style,
   lightColor,
   darkColor,
+  tab,
   ...otherProps
 }: ScanControlProps) {
   const { isScanning, setIsScanning, setInitialState } =
     useContext(GlobalContext);
 
   const {
-    // allDevices,
-    connectedDevice,
-    connectToDevice,
     requestPermissions,
     scanForPeripherals,
     stopScanForPeripherals,
-    clearAll,
     bluetoothState,
   } = useBLE();
   const colorPlay = useThemeColor(
     { light: lightColor, dark: darkColor },
+    "greenAlpha"
+  );
+  const colorGreen = useThemeColor(
+    { light: lightColor, dark: darkColor },
     "green"
   );
   const colorStop = useThemeColor(
+    { light: lightColor, dark: darkColor },
+    "redAlpha"
+  );
+  const colorRed = useThemeColor(
     { light: lightColor, dark: darkColor },
     "red"
   );
@@ -53,9 +61,7 @@ export function ScanControl({
     }
   };
 
-  const connect = async (device: any) => {
-    connectToDevice(device);
-  };
+
   //TODO: try useCallback to avoid creating new function on every render
   const handleStartScan = () => {
     if (scanForDevices) {
@@ -83,23 +89,25 @@ export function ScanControl({
     >
       {isScanning ? (
         <>
-          <ThemedText style={{ fontSize: 14 }}>Scanning ...</ThemedText>
-          <TouchableHighlight
+          <TouchableOpacity
             activeOpacity={0.6}
-            underlayColor="#dddddd0"
             onPress={handleStopScan}
+            style={[{backgroundColor: colorStop,  borderColor: colorRed},styles.button]}
           >
-            <FontAwesome6 size={28} name="circle-stop" color={colorStop} />
-          </TouchableHighlight>
+            
+            <Ionicons name="stop-outline" size={24} color={colorRed} />
+            <ThemedText style={styles.text}>Stop</ThemedText>
+          </TouchableOpacity>
         </>
       ) : (
-        <TouchableHighlight
+        <TouchableOpacity
           activeOpacity={0.6}
-          underlayColor="#dddddd0"
           onPress={handleStartScan}
+          style={[{backgroundColor: colorPlay, borderColor: colorGreen},styles.button]}
         >
-          <FontAwesome6 size={28} name="circle-play" color={colorPlay} />
-        </TouchableHighlight>
+          <Feather name="play" size={24} color={colorGreen} />
+          <ThemedText style={styles.text}>Scan</ThemedText>
+        </TouchableOpacity>
       )}
     </ThemedView>
   );
@@ -107,7 +115,7 @@ export function ScanControl({
 
 const styles = StyleSheet.create({
   controlsWrapper: {
-    backgroundColor: "#fff ",
+    backgroundColor: "transparent",
     display: "flex",
     flexDirection: "row",
     gap: 12,
@@ -115,4 +123,20 @@ const styles = StyleSheet.create({
     pointerEvents: "auto",
     alignItems: "flex-end",
   },
+  button: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    width: 100,
+    gap: 5,
+    height: 40,
+  },
+  text: {
+    fontSize: 14,
+    fontFamily: "defaultSemiBold"
+  }
 });

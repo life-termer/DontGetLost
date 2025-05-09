@@ -123,7 +123,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   textInput: {
-    textAlign: "center",
     margin: "auto",
     fontFamily: "MontserratSemiBold",
     fontSize: 15,

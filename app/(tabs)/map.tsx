@@ -20,7 +20,7 @@ export default function SettingsScreen() {
         minHeight: "100%",
       }}
     >
-      <SubHeader />
+      <SubHeader tab='map' />
       <MapView />
     </View>
   );

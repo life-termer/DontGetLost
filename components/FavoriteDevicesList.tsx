@@ -12,7 +12,7 @@ export default function FavoriteDevicesList({
 }: {
   tab: string | undefined;
 }) {
-  const { allDevices, favoriteDevices, setFavoriteDevices, sorting } =
+  const { allDevices, favoriteDevices, setFavoriteDevices, sorting, search } =
     useContext(GlobalContext);
   // Automatically update favoriteDevices when allDevices changes
   useEffect(() => {
@@ -31,16 +31,21 @@ export default function FavoriteDevicesList({
           }
         }
       });
+   
     if (JSON.stringify(favorites) !== JSON.stringify(favoriteDevices)) {
       setFavoriteDevices(favorites);
     }
-  }, [allDevices, setFavoriteDevices, sorting]);
+  }, [allDevices, setFavoriteDevices, sorting, search]);
+  const filteredFavorites = favoriteDevices.filter((device: any) => {
+    if (!search) return true;
+    return device.name.toLowerCase().includes(search.toLowerCase());
+  });
   return (
     <>
       {favoriteDevices.length > 0 ? (
         <ThemedView style={styles.listContainer}>
           <ThemedView style={styles.listWrapper}>
-            {favoriteDevices.map((device: any) => (
+            {filteredFavorites.map((device: any) => (
               <DeviceCard device={device} key={device.id} />
             ))}
           </ThemedView>

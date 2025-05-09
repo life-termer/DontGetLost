@@ -25,7 +25,7 @@ export type SortOptions = TextProps & {
   darkColor?: string;
 };
 
-export default function SortOptions({ lightColor, darkColor }: SortOptions) {
+export default function FavoritesHeader({ lightColor, darkColor }: SortOptions) {
   const { favoriteDevices } =
     useContext(GlobalContext);
 

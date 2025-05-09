@@ -1,5 +1,7 @@
 import {
+  Linking,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -20,6 +22,7 @@ import { useContext, useEffect, useState } from "react";
 import { GlobalContext } from "@/context/GlobalContext";
 import SaveModalBtn from "./SaveModalBtn";
 import ToggleFavorites from "./ToggleFavorites";
+import { GPSLink } from "./GPSLink";
 
 export type Props = TextProps & {
   lightColor?: string;
@@ -79,9 +82,12 @@ export default function ModalInfo({ lightColor, darkColor, device }: Props) {
     "backgroundLight"
   );
 
+
+
   useEffect(() => {
     onChangeText(device.customName || device.name);
   }, [isModalVisible]);
+
   return (
     <View>
       <Modal animationType="fade" transparent={true} visible={isModalVisible}>
@@ -151,7 +157,7 @@ export default function ModalInfo({ lightColor, darkColor, device }: Props) {
                   {
                     justifyContent: "space-between",
                     width: "100%",
-                    marginBottom: 30,
+                    marginBottom: 15,
                   },
                   styles.rowContainer,
                 ]}
@@ -205,6 +211,7 @@ export default function ModalInfo({ lightColor, darkColor, device }: Props) {
                   </View>
                 </View>
               </View>
+              <GPSLink />
               <View style={[{marginBottom: 20},styles.rowContainer]}>
                 <View style={{ width: "90%" }}>
                   <SaveModalBtn onSave={onSave} />

@@ -1,25 +1,35 @@
 import { StyleSheet, useColorScheme, View } from "react-native";
 
 import { ThemedView } from "@/components/ThemedView";
-import { ScanControl } from "@/components/ScanControl";
-import { BluetoothState } from "@/components/BluetoothState";
+import { ScanBtn } from "@/components/ScanBtn";
 import { Colors } from "@/constants/Colors";
+import SearchBtn from "./SearchBtn";
+import { ClearBtn } from "./ClearBtn";
+import DropdownComponent from "./DropdownComponent";
 
-export default function SubHeader() {
+interface Props {
+  tab: string;
+}
+
+export default function SubHeader({ tab }: Props) {
   const colorScheme = useColorScheme();
 
   return (
-      <ThemedView
-        style={[
-          {
-            backgroundColor: Colors[colorScheme ?? "light"].backgroundLight,
-          },
-          styles.titleContainer,
-        ]}
-      >
-        <BluetoothState />
-        <ScanControl />
-      </ThemedView>
+    <ThemedView
+      style={[
+        {
+          backgroundColor: Colors[colorScheme ?? "light"].backgroundLight,
+        },
+        styles.titleContainer,
+      ]}
+    >
+      <SearchBtn tab={tab} />
+      <View style={styles.rowContainer}>
+        {/* <DropdownComponent /> */}
+        <ScanBtn />
+        <ClearBtn />
+      </View>
+    </ThemedView>
   );
 }
 
@@ -38,5 +48,10 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 12,
     borderBottomRightRadius: 12,
   },
-  
+  rowContainer: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
 });

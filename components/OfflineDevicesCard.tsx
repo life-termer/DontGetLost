@@ -22,39 +22,53 @@ import { FontAwesome, FontAwesome6 } from "@expo/vector-icons";
 import { Device } from "react-native-ble-plx";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Colors } from "@/constants/Colors";
-import OfflineDevicesCard from "./OfflineDevicesCard";
 
 export type OfflineDevicesMap = TextProps & {
   lightColor?: string;
   darkColor?: string;
-  offlineDevices: any[];
+  device: {
+    id: string;
+    name: string;
+    isConnectable: boolean;
+    mtu: number;
+    rssi: number;
+    distance?: number;
+    isFavorite: boolean;
+    isOutOfRange: boolean;
+    customName: string;
+  };
 };
 
-export default function OfflineDevicesMap({
+export default function OfflineDevicesCard({
   lightColor,
   darkColor,
-  offlineDevices,
+  device,
 }: OfflineDevicesMap) {
+  const { favoriteDevices, setCurrentDevice, setIsModalVisible } =
+    useContext(GlobalContext);
 
+  const showModal = () => {
+    setCurrentDevice(device.id);
+    setIsModalVisible(true);
+  };
 
-  const colorOverlayLight = useThemeColor(
+  const colorBackground = useThemeColor(
     { light: lightColor, dark: darkColor },
-    "overlayLight"
+    "backgroundLight"
   );
 
   const colorRed = useThemeColor({ light: lightColor, dark: darkColor }, "red");
 
   return (
-    <View
-      style={[
-        { backgroundColor: colorOverlayLight, borderColor: colorRed },
-        styles.container,
-      ]}
-    >
-      {offlineDevices.map((device: any) => (
-        <OfflineDevicesCard key={device.id} device={device} />
-      ))}
-    </View>
+    <TouchableOpacity onPress={showModal}>
+      <ThemedText
+        key={device.id}
+        type="subtitle"
+        style={[{ color: colorRed }, styles.titleText]}
+      >
+        {device.customName || device.name}
+      </ThemedText>
+    </TouchableOpacity>
   );
 }
 
@@ -67,10 +81,22 @@ const styles = StyleSheet.create({
     right: 10,
     justifyContent: "center",
     alignItems: "center",
-    zIndex: 300,
+    zIndex: 100,
     paddingHorizontal: 8,
-    paddingVertical: 8,
-    gap: 8,
+    paddingVertical: 5,
   },
-
+  titleText: {
+    fontSize: 12,
+    lineHeight: 20,
+    textAlign: "center",
+  },
+  baseText: {
+    fontSize: 13,
+    margin: 0,
+    padding: 0,
+    lineHeight: 15,
+    textAlign: "center",
+    paddingHorizontal: 4,
+    paddingVertical: 2,
+  },
 });

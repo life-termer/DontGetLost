@@ -66,7 +66,13 @@
           ]
         }
       ],
-      "react-native-ble-plx"
+      "react-native-ble-plx",
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow BLESearch to use your location."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

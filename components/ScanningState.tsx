@@ -3,6 +3,7 @@ import {
   type TextProps,
   StyleSheet,
   TouchableHighlight,
+  View,
 } from "react-native";
 
 import { useThemeColor } from "@/hooks/useThemeColor";
@@ -18,7 +19,7 @@ export type ScanControlProps = TextProps & {
   darkColor?: string;
 };
 
-export function BluetoothState({
+export function ScanningState({
   style,
   lightColor,
   darkColor,
@@ -26,9 +27,9 @@ export function BluetoothState({
 }: ScanControlProps) {
   const { bluetoothState } = useBLE();
 
-  const colorBlue = useThemeColor(
+  const colorGreen = useThemeColor(
     { light: lightColor, dark: darkColor },
-    "blue"
+    "greenAlpha"
   );
   const colorBackground = useThemeColor(
     { light: lightColor, dark: darkColor },
@@ -37,34 +38,33 @@ export function BluetoothState({
   const colorRed = useThemeColor({ light: lightColor, dark: darkColor }, "red");
 
   return (
-    <ThemedView style={[{backgroundColor: colorBackground},styles.badge]}>
-      <ThemedText
-        style={
-          bluetoothState === "on"
-            ? [{ color: colorBlue }, styles.text]
-            : [{ color: colorRed }, styles.text]
-        }
-      >{`Bluetooth is ${bluetoothState}`}</ThemedText>
-    </ThemedView>
+    <View style={[{ backgroundColor: colorBackground }, styles.container]}>
+      {bluetoothState === "off" ? (
+        <>
+          <FontAwesome size={16} name="circle" color={colorRed} />
+          <ThemedText style={styles.text}>Bluetooth is off</ThemedText>
+        </>
+      ) : (
+        <>
+          <FontAwesome size={16} name="circle" color={colorGreen} />
+          <ThemedText style={styles.text}>Scanning for devices...</ThemedText>
+        </>
+      )}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  badge: {
+  container: {
     display: "flex",
     flexDirection: "row",
-    padding: 15,
-    paddingTop: 5,
-    paddingBottom: 5,
-    borderRadius: 16,
+    width: "100%",
+    paddingTop: 20,
     justifyContent: "center",
     alignItems: "center",
+    gap: 6,
   },
   text: {
     fontSize: 14,
-  },
-  textRed: {
-    fontSize: 14,
-    color: "red",
   },
 });

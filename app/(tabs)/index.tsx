@@ -1,53 +1,36 @@
-import { ScrollView, StyleSheet, useColorScheme, View } from "react-native";
+import { ScrollView, useColorScheme, View } from "react-native";
 import SubHeader from "@/components/SubHeader";
 import { useContext, useState } from "react";
 import { getUsers } from "@/scripts/firebase-data";
-import useBLE from "@/hooks/useBLE";
-import { GlobalContext } from "@/context/GlobalContext";
 import AllDevicesList from "@/components/AllDevicesList";
-import FavoriteDevicesList from "@/components/FavoriteDevicesList";
 import { Colors }from "@/constants/Colors";
-import ModalInfo from "@/components/ModalInfo";
+import { ScanningState } from "@/components/ScanningState";
+import { GlobalContext } from "@/context/GlobalContext";
+import useBLE from "@/hooks/useBLE";
 
 export default function HomeScreen() {
-  const {
-    // allDevices,
-    connectedDevice,
-    connectToDevice,
-    requestPermissions,
-    scanForPeripherals,
-    stopScanForPeripherals,
-    clearAll,
-    bluetoothState,
-  } = useBLE();
 
   const colorScheme = useColorScheme();
+  const { bluetoothState } = useBLE();
 
   interface UserInt {
     name: string;
     email: string;
   }
   const [user, setUser] = useState<UserInt>();
-  const scanForDevices = async () => {
-    const isPermissionsEnabled = await requestPermissions();
-    if (isPermissionsEnabled) {
-      scanForPeripherals();
-    }
-  };
-
-  const connect = async (device: any) => {
-    connectToDevice(device);
-  };
+  
   const onPressGetUser = () => {
     getUsers().then((users) => {
       setUser(users[1] as UserInt);
     });
   };
+  const { isScanning } = useContext(GlobalContext);
+
   return (
     <View style={{ backgroundColor:  Colors[colorScheme ?? "light"].background, minHeight: "100%" }}>
-      <SubHeader />
+      <SubHeader tab="index"/>
       <ScrollView>
-        {/* <FavoriteDevicesList tab="index" /> */}
+        {isScanning || bluetoothState === "off" ? <ScanningState /> : null}
         <AllDevicesList />
       </ScrollView>
       </View>

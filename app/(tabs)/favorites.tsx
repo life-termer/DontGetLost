@@ -3,7 +3,7 @@ import SubHeader from "@/components/SubHeader";
 import FavoriteDevicesList from "@/components/FavoriteDevicesList";
 import { Colors } from "@/constants/Colors";
 import { SortingButton } from "@/components/SortingButton";
-import SortOptions from "@/components/SortOptions";
+import FavoritesHeader from "@/components/FavoritesHeader";
 
 export default function FavoritesScreen() {
   const colorScheme = useColorScheme();
@@ -15,10 +15,10 @@ export default function FavoritesScreen() {
         minHeight: "100%",
       }}
     >
-      <SubHeader />
+      <SubHeader tab="favorites" />
       <ScrollView>
         {/* TODO: Add sorting and filtering options */}
-        <SortOptions />
+        <FavoritesHeader />
         <FavoriteDevicesList tab={"favorites"} />
       </ScrollView>
     </View>
