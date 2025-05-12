@@ -5,7 +5,8 @@ import { ScanBtn } from "@/components/ScanBtn";
 import { Colors } from "@/constants/Colors";
 import SearchBtn from "./SearchBtn";
 import { ClearBtn } from "./ClearBtn";
-import DropdownComponent from "./DropdownComponent";
+import DropdownComponent from "./SortingButton";
+import SortingButton from "./SortingButton";
 
 interface Props {
   tab: string;
@@ -25,7 +26,7 @@ export default function SubHeader({ tab }: Props) {
     >
       <SearchBtn tab={tab} />
       <View style={styles.rowContainer}>
-        {/* <DropdownComponent /> */}
+        <SortingButton />
         <ScanBtn />
         <ClearBtn />
       </View>

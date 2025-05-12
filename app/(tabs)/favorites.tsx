@@ -2,7 +2,7 @@ import { ScrollView, useColorScheme, View } from "react-native";
 import SubHeader from "@/components/SubHeader";
 import FavoriteDevicesList from "@/components/FavoriteDevicesList";
 import { Colors } from "@/constants/Colors";
-import { SortingButton } from "@/components/SortingButton";
+import { SortingButton } from "@/components/SortingButton2";
 import FavoritesHeader from "@/components/FavoritesHeader";
 
 export default function FavoritesScreen() {

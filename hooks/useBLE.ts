@@ -265,11 +265,13 @@ function useBLE() {
                 name: device.name || "Unknown Device",
                 distance: distance,
                 lastUpdated: Date.now(), // Add a timestamp for the last update
+                lastSeen: Date.now(),
                 isFavorite: prevState[existingIndex]?.isFavorite || false, // Preserve favorite status
                 isOutOfRange: false, // Reset out-of-range status when the device is updated
                 customName: prevState[existingIndex]?.customName || undefined, // Preserve customName
                 favoriteTimestamp:
                   prevState[existingIndex]?.favoriteTimestamp || undefined, // Preserve favoriteTimestamp
+                location: prevState[existingIndex]?.location || undefined, // Preserve existing location
               };
 
               if (existingIndex > -1) {
@@ -298,18 +300,14 @@ function useBLE() {
           return prevState
             .map((device) => {
               if (now - device.lastUpdated > 120000) {
-                if (device.isFavorite) {
-                  // Mark favorite devices as out of range
+                  // Mark devices as out of range
                   return {
                     ...device,
                     isOutOfRange: true,
                     distance: undefined,
                     rssi: undefined,
                   };
-                } else {
-                  // Remove non-favorite devices
-                  return null;
-                }
+                
               }
               // Reset out-of-range status for devices that are updated
               return { ...device, isOutOfRange: false };
@@ -317,6 +315,10 @@ function useBLE() {
             .filter(Boolean); // Remove null entries
         });
       }, 3000); // Check every second
+
+      if(!isScanning) {
+        clearInterval(interval); // Stop checking when not scanning
+      }
 
       return () => clearInterval(interval); // Cleanup on unmount
     }
@@ -370,42 +372,45 @@ function useBLE() {
   };
 
   // Get GPS location
-  // useEffect(() => {
-  //   const getLocation = async () => {
-  //     try {
-  //       const { status } = await Location.requestForegroundPermissionsAsync();
-  //       if (status !== "granted") {
-  //         console.log("Location permission denied");
-  //         return;
-  //       }
-  //       const currentLocation = await Location.getCurrentPositionAsync({});
-  //       setLocation(currentLocation);
-  //       setAllDevices((prevDevices: any[]) => {
-  //         return prevDevices.map((device) => {
-  //           if (device.isFavorite && !device.isOutOfRange) {
-  //             return {
-  //               ...device,
-  //               lastSeen: Date.now(),
-  //               location: {
-  //                 latitude: currentLocation.coords.latitude,
-  //                 longitude: currentLocation.coords.longitude,
-  //               },
-  //             };
-  //           }
-  //           return device;
-  //         });
-  //       });
-  //     } catch (error) {
-  //       console.log("Error getting location", error);
-  //     }
-  //   };
+  useEffect(() => {
+    const getLocation = async () => {
+      console.log("Location interval started");
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+          console.log("Location permission denied");
+          return;
+        }
+        const currentLocation = await Location.getCurrentPositionAsync({});
+        setLocation(currentLocation);
+        setAllDevices((prevDevices: any[]) => {
+          return prevDevices.map((device) => {
+            if (device.isFavorite && !device.isOutOfRange) {
+              return {
+                ...device,
+                
+                location: {
+                  latitude: currentLocation.coords.latitude,
+                  longitude: currentLocation.coords.longitude,
+                },
+              };
+            }
+            return device;
+          });
+        });
+      } catch (error) {
+        console.log("Error getting location", error);
+      }
+    };
 
-  //   getLocation(); // Get initial location
-
-  //   const intervalId = setInterval(getLocation, 30000); // Update every 30 seconds
-
-  //   return () => clearInterval(intervalId); // Cleanup interval on unmount
-  // }, []);
+    getLocation(); // Get initial location
+    const intervalId = setInterval(getLocation, 30000);
+    if(!isScanning) {
+      clearInterval(intervalId); // Update every 30 seconds
+      console.log("Location interval stopped");
+    }
+    return () => clearInterval(intervalId); // Cleanup interval on unmount
+  }, [isScanning]);
 
   return {
     connectedDevice,

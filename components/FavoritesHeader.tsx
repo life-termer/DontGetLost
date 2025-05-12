@@ -17,7 +17,7 @@ import { useThemeColor } from "@/hooks/useThemeColor";
 import { FontAwesome, FontAwesome6 } from "@expo/vector-icons";
 import { Device } from "react-native-ble-plx";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { SortingButton } from "./SortingButton";
+import { SortingButton } from "./SortingButton2";
 import { FavoritesStats } from "./FavoritesStats";
 
 export type SortOptions = TextProps & {

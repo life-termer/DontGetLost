@@ -18,20 +18,20 @@ import Feather from '@expo/vector-icons/Feather';
 export type Props = TextProps & {
   lightColor?: string;
   darkColor?: string;
-  deviceName?: string;
+  device: any;
 };
 
 export function GPSLink({
   style,
   lightColor,
   darkColor,
-  deviceName,
+  device,
   ...otherProps
 }: Props) {
   const openMap = () => {
-    const latitude = 46.056946; // Replace with your desired latitude
-    const longitude = 14.505751; // Replace with your desired longitude
-    const label = deviceName || "Device Location";
+    const latitude = device.location.latitude ? device.location.latitude : ""; // Replace with your desired latitude
+    const longitude = device.location.longitude ? device.location.longitude : ""; // Replace with your desired longitude
+    // const label = deviceName || "Device Location";
     const url = Platform.select({
       ios: `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`,
       // android: `geo:${latitude},${longitude}?q=${label}`,
@@ -71,7 +71,7 @@ export function GPSLink({
         styles.rowContainer,
       ]}
     >
-      <TouchableOpacity onPress={openMap} style={[{ backgroundColor: colorBackground }, styles.dataContainer]}>
+      <TouchableOpacity onPress={openMap} style={[{ backgroundColor: colorBackground, pointerEvents: device.location ? "auto" : "none", opacity: device.location ? 1 : 0.5 }, styles.dataContainer]}>
      
         <Entypo name="location" size={24} color={colorBlue} />
         <View>
@@ -96,7 +96,7 @@ export function GPSLink({
             Last Seen
           </ThemedText>
           <ThemedText type="defaultSemiBold" style={styles.textSm}>
-            {formatDate(Date.now())}
+            {formatDate(device.lastSeen)}
           </ThemedText>
         </View>
       </View>

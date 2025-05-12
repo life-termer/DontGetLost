@@ -211,7 +211,7 @@ export default function ModalInfo({ lightColor, darkColor, device }: Props) {
                   </View>
                 </View>
               </View>
-              <GPSLink />
+              <GPSLink device={device}/>
               <View style={[{marginBottom: 20},styles.rowContainer]}>
                 <View style={{ width: "90%" }}>
                   <SaveModalBtn onSave={onSave} />
