@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { memo, useContext } from "react";
 import {
   StyleSheet,
   type TextProps,
@@ -16,24 +16,15 @@ import Feather from "@expo/vector-icons/Feather";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import ToggleFavorites from "./ToggleFavorites";
 import DeviceName from "./DeviceName";
+import ModalInfo from "./ModalInfo";
 
 export type DeviceCardProps = TextProps & {
   lightColor?: string;
   darkColor?: string;
-  device: {
-    id: string;
-    name: string;
-    isConnectable: boolean;
-    mtu: number;
-    rssi: number;
-    distance?: number;
-    isFavorite: boolean;
-    isOutOfRange: boolean;
-    customName: string;
-  };
+  device: any;
 };
 
-export default function DeviceCard({
+const DeviceCard = memo(function DeviceCard({
   lightColor,
   darkColor,
   device,
@@ -102,13 +93,6 @@ export default function DeviceCard({
             size={16}
             color={colorStatus(device.distance)}
           />
-          {/* <ThemedText
-            type="subtitle"
-            style={{ fontSize: 15, lineHeight: 16, marginEnd: 5 }}
-          >
-            {device.customName || device.name}
-          </ThemedText>
-          <Octicons name="pencil" size={15} color="black" /> */}
           <DeviceName device={device} />
         </View>
         <View style={[{ gap: 20 }, styles.rowContainer]}>
@@ -156,7 +140,8 @@ export default function DeviceCard({
       <DistanceBar device={device} />
     </View>
   );
-}
+});
+export default DeviceCard;
 
 const styles = StyleSheet.create({
   container: {

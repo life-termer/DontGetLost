@@ -29,10 +29,10 @@ export default function HomeScreen() {
   return (
     <View style={{ backgroundColor:  Colors[colorScheme ?? "light"].background, minHeight: "100%" }}>
       <SubHeader tab="index"/>
-      <ScrollView>
+      <View>
         {isScanning || bluetoothState === "off" ? <ScanningState /> : null}
         <AllDevicesList />
-      </ScrollView>
+      </View>
       </View>
   );
 }

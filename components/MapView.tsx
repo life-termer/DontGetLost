@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, memo } from "react";
 import {
   StyleSheet,
   View,
@@ -26,7 +26,7 @@ export type MapViewProps = TextProps & {
   darkColor?: string;
 };
 
-export default function MapView({ lightColor, darkColor }: MapViewProps) {
+const MapView = memo(function MapView({ lightColor, darkColor }: MapViewProps) {
   const colorScheme = useColorScheme();
   const { favoriteDevices } = useContext(GlobalContext);
   const activeDevices = favoriteDevices.filter(
@@ -120,7 +120,8 @@ export default function MapView({ lightColor, darkColor }: MapViewProps) {
       })}
     </View>
   );
-}
+}); 
+export default MapView;
 
 const styles = StyleSheet.create({
   text: {

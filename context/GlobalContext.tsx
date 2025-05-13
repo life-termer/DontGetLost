@@ -83,6 +83,7 @@ const GlobalProvider = ({ children }: { children: ReactNode }) => {
             ...device,
             rssi: 0,
             distance: undefined,
+            isOutOfRange: true,
           }));
           setAllDevices(favorites);
         }
