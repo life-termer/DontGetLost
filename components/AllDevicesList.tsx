@@ -55,18 +55,16 @@ export default function AllDevicesList() {
       {allDevices.length > 0 ? (
         <ThemedView style={styles.listContainer}>
           <ThemedView style={styles.listWrapper}>
-            <FlatList
+            {/* <FlatList
               data={filteredDevices}
               renderItem={({ item }) => <DeviceCard device={item} />}
               keyExtractor={(item) => item.id}
-            />
-            {/* {filteredDevices.map((device: any) => {
-              return  (
-                <DeviceCard device={device} key={device.id} />
-              ) 
-            })} */}
+            /> */}
+            {filteredDevices.map((device: any) => {
+              return <DeviceCard device={device} key={device.id} />;
+            })}
           </ThemedView>
-          {device && <ModalInfo device={device} />}
+          {/* {device && <ModalInfo device={device} />} */}
         </ThemedView>
       ) : (
         <View />

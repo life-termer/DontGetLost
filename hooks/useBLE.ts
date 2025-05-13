@@ -1,8 +1,15 @@
 /* eslint-disable no-bitwise */
-import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { PermissionsAndroid, Platform } from "react-native";
 import * as Location from "expo-location";
-import { throttle } from 'lodash';
+// import { throttle } from "lodash";
 
 import * as ExpoDevice from "expo-device";
 
@@ -20,6 +27,10 @@ import { GlobalContext } from "@/context/GlobalContext";
 const DATA_SERVICE_UUID = "19b10000-e8f2-537e-4f6c-d104768a1214";
 const COLOR_CHARACTERISTIC_UUID = "19b10001-e8f2-537e-4f6c-d104768a1217";
 
+const OFFLINE_DEVICES_TIMEOUT = 120000; // 2 minutes
+const UPDATE_INTERVAL = 5000; // 5 seconds
+const LOCATION_UPDATE_INTERVAL = 10000; // 10 seconds
+
 const bleManager = new BleManager();
 
 function useBLE() {
@@ -32,8 +43,8 @@ function useBLE() {
     null
   );
 
-   // Create a buffer to hold discovered devices
-   const deviceBuffer = useRef<Device[]>([]);
+  // Create a buffer to hold discovered devices
+  const deviceBuffer = useRef<Device[]>([]);
 
   bleManager.onStateChange((state) => {
     if (state === "PoweredOn") {
@@ -110,7 +121,6 @@ function useBLE() {
     }
   };
 
-
   const calculateDistance = (rssi: number, txPower: number) => {
     if (rssi === 0) {
       return -1.0; // Unknown
@@ -136,7 +146,6 @@ function useBLE() {
         );
 
         const existingDevice = prevState[existingIndex];
-
         const updatedDevice = {
           ...device,
           name: device.name || "Unknown Device",
@@ -148,7 +157,11 @@ function useBLE() {
           customName: prevState[existingIndex]?.customName || undefined, // Preserve customName
           favoriteTimestamp:
             prevState[existingIndex]?.favoriteTimestamp || undefined, // Preserve favoriteTimestamp
-          location: existingDevice?.location, // Preserve existing location
+          // location: existingDevice?.location, // Preserve existing location
+          location: {
+            latitude: location?.coords.latitude,
+            longitude: location?.coords.longitude,
+          },
         };
 
         if (existingIndex > -1) {
@@ -167,35 +180,27 @@ function useBLE() {
     [setAllDevices, calculateDistance]
   );
 
-  const debounce = useCallback(
-    <T extends (...args: any[]) => void>(func: T, delay: number) => {
-      const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const getLocation = async () => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        console.log("Location permission denied");
+        return;
+      }
+      const currentLocation = await Location.getCurrentPositionAsync({});
+      setLocation(currentLocation);
+      console.log("Get Location");
+    } catch (error) {
+      console.log("Error getting location", error);
+    }
+  };
 
-      return (...args: Parameters<T>) => {
-        if (timeoutRef.current) {
-          clearTimeout(timeoutRef.current);
-        }
-
-        timeoutRef.current = setTimeout(() => {
-          console.log("Debounced function executing"); // Add this line
-          func(...args);
-          timeoutRef.current = undefined;
-        }, delay);
-      };
-    },
-    []
-  );
-
-  const debouncedUpdateDeviceList = debounce((device: Device) => {
-    updateDeviceList(device);
-  }, 2000);
-
-  const throttledUpdateDeviceList = useCallback(
-    throttle((device: Device) => {
-      updateDeviceList(device);
-    }, 1000), // Adjust the interval as needed
-    [updateDeviceList]
-  );
+  // const throttledUpdateDeviceList = useCallback(
+  //   throttle((device: Device) => {
+  //     updateDeviceList(device);
+  //   }, 1000), // Adjust the interval as needed
+  //   [updateDeviceList]
+  // );
 
   const scanForPeripherals = () => {
     bleManager.state().then((state) => {
@@ -225,54 +230,18 @@ function useBLE() {
 
           if (true) {
             // Add the discovered device to the buffer
-          deviceBuffer.current = [...deviceBuffer.current, device];
+            deviceBuffer.current = [...deviceBuffer.current, device];
             // throttledUpdateDeviceList(device);
-            // setAllDevices((prevState: any[]) => {
-            //   const txPower = -50; // Replace with the actual TX power of your device
-            //   const distance =
-            //     device.rssi !== null
-            //       ? calculateDistance(device.rssi, txPower)
-            //       : -1;
-            //   // console.log(distance + "m");
-
-            //   const existingIndex = prevState.findIndex(
-            //     (d: { id: string }) => d.id === device.id
-            //   );
-
-            //   const updatedDevice = {
-            //     ...device,
-            //     name: device.name || "Unknown Device",
-            //     distance: distance,
-            //     lastUpdated: Date.now(), // Add a timestamp for the last update
-            //     lastSeen: Date.now(),
-            //     isFavorite: prevState[existingIndex]?.isFavorite || false, // Preserve favorite status
-            //     isOutOfRange: false, // Reset out-of-range status when the device is updated
-            //     customName: prevState[existingIndex]?.customName || undefined, // Preserve customName
-            //     favoriteTimestamp:
-            //       prevState[existingIndex]?.favoriteTimestamp || undefined, // Preserve favoriteTimestamp
-            //     location: prevState[existingIndex]?.location || undefined, // Preserve existing location
-            //   };
-
-            //   if (existingIndex > -1) {
-            //     // Replace existing device
-            //     const updatedDevices = [...prevState];
-            //     updatedDevices[existingIndex] = updatedDevice;
-            //     return updatedDevices;
-            //   } else {
-            //     // Add new device
-            //     console.log("Adding device to list:", device.id);
-            //     return [...prevState, updatedDevice];
-            //   }
-            // });
           }
         }
       );
     });
   };
 
-   // Process the device buffer every X milliseconds
-   useEffect(() => {
-    const processBuffer = () => {
+  // Process the device buffer every X milliseconds
+  useEffect(() => {
+    const processBuffer = async () => {
+      // await getLocation();
       if (deviceBuffer.current.length > 0) {
         console.log(
           "Processing device buffer:",
@@ -284,38 +253,39 @@ function useBLE() {
       }
     };
 
-    const intervalId = setInterval(processBuffer, 5000); // Process every 2 seconds
+    const intervalId = setInterval(processBuffer, UPDATE_INTERVAL); // Process every 2 seconds
+    console.log("Processing device buffer");
 
     return () => clearInterval(intervalId); // Clear interval on unmount
-  }, [updateDeviceList]);
-
+  }, []);
 
   // Periodically remove stale devices
   useEffect(() => {
     if (isScanning) {
       const interval = setInterval(() => {
+        console.log("Removing stale devices");
         setAllDevices((prevState: any[]) => {
           const now = Date.now();
           return prevState
             .map((device) => {
-              if (now - device.lastUpdated > 120000) {
-                  // Mark devices as out of range
-                  return {
-                    ...device,
-                    isOutOfRange: true,
-                    distance: undefined,
-                    rssi: undefined,
-                  };
-                
+              if (now - device.lastUpdated > OFFLINE_DEVICES_TIMEOUT) {
+                // Mark devices as out of range
+                return {
+                  ...device,
+                  isOutOfRange: true,
+                  distance: undefined,
+                  rssi: undefined,
+                };
               }
               // Reset out-of-range status for devices that are updated
               return { ...device, isOutOfRange: false };
             })
             .filter(Boolean); // Remove null entries
         });
-      }, 10000); // Check every second
+      }, 10000); // Check every  10 second
 
-      if(!isScanning) {
+      if (!isScanning) {
+        console.log("Stopping removing stale devices");
         clearInterval(interval); // Stop checking when not scanning
       }
 
@@ -328,64 +298,25 @@ function useBLE() {
     setIsScanning(false);
   };
 
-
-
-  const clearAll = async () => {
-    setAllDevices([]);
-    console.log("Cleared all devices");
-    try {
-      // Disconnect the currently connected device
-      if (connectedDevice) {
-        await bleManager.cancelDeviceConnection(connectedDevice.id);
-        console.log(`Disconnected from device: ${connectedDevice.id}`);
-      }
-
-      // Clear the list of all devices
-    } catch (error) {
-      console.log("Error clearing devices:", error);
-    }
-    setConnectedDevice(null);
-  };
-
   // Get GPS location
   useEffect(() => {
-    const getLocation = async () => {
-      console.log("Location interval started");
-      try {
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== "granted") {
-          console.log("Location permission denied");
-          return;
-        }
-        const currentLocation = await Location.getCurrentPositionAsync({});
-        setLocation(currentLocation);
-        setAllDevices((prevDevices: any[]) => {
-          return prevDevices.map((device) => {
-            if (device.isFavorite && !device.isOutOfRange) {
-              return {
-                ...device,
-                
-                location: {
-                  latitude: currentLocation.coords.latitude,
-                  longitude: currentLocation.coords.longitude,
-                },
-              };
-            }
-            return device;
-          });
-        });
-      } catch (error) {
-        console.log("Error getting location", error);
+    let intervalId: NodeJS.Timeout | null = null;
+    if (isScanning) {
+      getLocation(); // Get initial location
+      intervalId = setInterval(getLocation, LOCATION_UPDATE_INTERVAL);
+    }
+
+    if (!isScanning) {
+      if (intervalId !== undefined && intervalId !== null) {
+        clearInterval(intervalId);
+        console.log("Location interval cleared");
+      }
+    }
+    return () => {
+      if (intervalId !== null) {
+        clearInterval(intervalId); // Cleanup interval on unmount
       }
     };
-
-    getLocation(); // Get initial location
-    const intervalId = setInterval(getLocation, 60000);
-    if(!isScanning) {
-      clearInterval(intervalId); // Update every 30 seconds
-      console.log("Location interval stopped");
-    }
-    return () => clearInterval(intervalId); // Cleanup interval on unmount
   }, [isScanning]);
 
   return {

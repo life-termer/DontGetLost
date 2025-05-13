@@ -28,10 +28,18 @@ export type Props = TextProps & {
   lightColor?: string;
   darkColor?: string;
   device: any;
+  isModalVisible: boolean;
+  setIsModalVisible: (isVisible: boolean) => void;
 };
 
-export default function ModalInfo({ lightColor, darkColor, device }: Props) {
-  const { isModalVisible, setIsModalVisible, setAllDevices, saveFavoriteDevices2 } = useContext(GlobalContext);
+export default function ModalInfo({
+  lightColor,
+  darkColor,
+  device,
+  isModalVisible,
+  setIsModalVisible,
+}: Props) {
+  const { setAllDevices, saveFavoriteDevices2 } = useContext(GlobalContext);
   const [deviceName, onChangeText] = useState(device.customName || device.name);
 
   const onModalClose = () => {
@@ -72,7 +80,10 @@ export default function ModalInfo({ lightColor, darkColor, device }: Props) {
     { light: lightColor, dark: darkColor },
     "yellow"
   );
-  const colorText = useThemeColor({ light: lightColor, dark: darkColor }, "text");
+  const colorText = useThemeColor(
+    { light: lightColor, dark: darkColor },
+    "text"
+  );
   const colorBackground = useThemeColor(
     { light: lightColor, dark: darkColor },
     "background"
@@ -82,8 +93,6 @@ export default function ModalInfo({ lightColor, darkColor, device }: Props) {
     "backgroundLight"
   );
 
-
-
   useEffect(() => {
     onChangeText(device.customName || device.name);
   }, [isModalVisible]);
@@ -91,7 +100,7 @@ export default function ModalInfo({ lightColor, darkColor, device }: Props) {
   return (
     <View>
       <Modal animationType="fade" transparent={true} visible={isModalVisible}>
-        <View style={[{backgroundColor: colorOverlay,},styles.modalContent]}>
+        <View style={[{ backgroundColor: colorOverlay }, styles.modalContent]}>
           <View
             style={[
               { backgroundColor: colorBackgroundLight },
@@ -122,7 +131,14 @@ export default function ModalInfo({ lightColor, darkColor, device }: Props) {
                 Device ID
               </ThemedText>
               <TextInput
-                style={[{ borderColor: colorBorder, backgroundColor: colorBackground, color: colorText }, styles.input]}
+                style={[
+                  {
+                    borderColor: colorBorder,
+                    backgroundColor: colorBackground,
+                    color: colorText,
+                  },
+                  styles.input,
+                ]}
                 value={device.id}
                 editable={false}
               />
@@ -133,7 +149,10 @@ export default function ModalInfo({ lightColor, darkColor, device }: Props) {
                 Custom Name
               </ThemedText>
               <TextInput
-                style={[{ borderColor: colorBorder, color: colorText }, styles.input]}
+                style={[
+                  { borderColor: colorBorder, color: colorText },
+                  styles.input,
+                ]}
                 onChangeText={onChangeText}
                 value={deviceName}
               />
@@ -211,8 +230,8 @@ export default function ModalInfo({ lightColor, darkColor, device }: Props) {
                   </View>
                 </View>
               </View>
-              <GPSLink device={device}/>
-              <View style={[{marginBottom: 20},styles.rowContainer]}>
+              <GPSLink device={device} />
+              <View style={[{ marginBottom: 20 }, styles.rowContainer]}>
                 <View style={{ width: "90%" }}>
                   <SaveModalBtn onSave={onSave} />
                 </View>
@@ -230,7 +249,7 @@ const styles = StyleSheet.create({
   modalContent: {
     height: "100%",
     width: "100%",
-    
+
     position: "absolute",
     left: 0,
   },

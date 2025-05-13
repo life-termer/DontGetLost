@@ -1,4 +1,4 @@
-import { memo, useContext } from "react";
+import { memo, useContext, useState } from "react";
 import {
   StyleSheet,
   type TextProps,
@@ -13,7 +13,7 @@ import { FontAwesome, FontAwesome6 } from "@expo/vector-icons";
 import DistanceBar from "./DistanceBar";
 import Octicons from "@expo/vector-icons/Octicons";
 import Feather from "@expo/vector-icons/Feather";
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import ToggleFavorites from "./ToggleFavorites";
 import DeviceName from "./DeviceName";
 import ModalInfo from "./ModalInfo";
@@ -29,8 +29,8 @@ const DeviceCard = memo(function DeviceCard({
   darkColor,
   device,
 }: DeviceCardProps) {
-  const { isScanning, setIsModalVisible, setCurrentDevice } =
-    useContext(GlobalContext);
+  const { isScanning, setCurrentDevice } = useContext(GlobalContext);
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const colorGreen = useThemeColor(
     { light: lightColor, dark: darkColor },
     "green"
@@ -75,8 +75,9 @@ const DeviceCard = memo(function DeviceCard({
   const colorRed = useThemeColor({ light: lightColor, dark: darkColor }, "red");
 
   const showModal = () => {
-    setCurrentDevice(device.id);
+    // setCurrentDevice(device.id);
     setIsModalVisible(true);
+    console.log("showModal");
   };
 
   return (
@@ -96,8 +97,11 @@ const DeviceCard = memo(function DeviceCard({
           <DeviceName device={device} />
         </View>
         <View style={[{ gap: 20 }, styles.rowContainer]}>
-          <TouchableOpacity onPress={showModal} style={{ paddingHorizontal: 10 }}>
-            <FontAwesome size={20} name="info" color={colorIcon}  />
+          <TouchableOpacity
+            onPress={showModal}
+            style={{ paddingHorizontal: 10 }}
+          >
+            <FontAwesome size={20} name="info" color={colorIcon} />
           </TouchableOpacity>
           <ToggleFavorites device={device} />
         </View>
@@ -107,7 +111,12 @@ const DeviceCard = memo(function DeviceCard({
           <ThemedText style={[{ marginBottom: 10 }, styles.baseText]}>
             {device.id}
           </ThemedText>
-          <View style={[{justifyContent: "space-between", width: "100%"},styles.rowContainer]}>
+          <View
+            style={[
+              { justifyContent: "space-between", width: "100%" },
+              styles.rowContainer,
+            ]}
+          >
             <View
               style={[
                 { backgroundColor: colorBackground },
@@ -128,16 +137,24 @@ const DeviceCard = memo(function DeviceCard({
               ]}
             >
               <ThemedText style={[{ marginBottom: 4 }, styles.baseText]}>
-              <MaterialCommunityIcons name="map-marker-distance" size={14} /> Distance
+                <MaterialCommunityIcons name="map-marker-distance" size={14} />{" "}
+                Distance
               </ThemedText>
               <ThemedText style={[styles.baseText]}>
-              ~{device.distance?.toFixed(2)}m
+                ~{device.distance?.toFixed(2)}m
               </ThemedText>
             </View>
           </View>
         </View>
       </View>
       <DistanceBar device={device} />
+      {isModalVisible ? (
+        <ModalInfo
+          device={device}
+          isModalVisible={isModalVisible}
+          setIsModalVisible={setIsModalVisible}
+        />
+      ) : null}
     </View>
   );
 });
