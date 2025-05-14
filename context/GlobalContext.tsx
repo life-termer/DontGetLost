@@ -24,6 +24,8 @@ export const GlobalContext = createContext<{
   setSearch: (value: string) => void;
   location: Location.LocationObject | null;
   setLocation: (value: Location.LocationObject) => void;
+  updateInterval: number | null;
+  setUpdateInterval: (value: number | null) => void;
 }>({
   isScanning: false,
   setIsScanning: () => {},
@@ -44,7 +46,8 @@ export const GlobalContext = createContext<{
   setSearch: () => {},
   location: null,
   setLocation:  () => {},
-
+  updateInterval: 10000,
+  setUpdateInterval: () => {},
 });
 
 const GlobalProvider = ({ children }: { children: ReactNode }) => {
@@ -59,6 +62,8 @@ const GlobalProvider = ({ children }: { children: ReactNode }) => {
   const [location, setLocation] = useState<Location.LocationObject | null>(
     null
   );
+  const [updateInterval, setUpdateInterval] = useState<number | null>(10000);
+
   const saveFavoriteDevices2 = async (devices: any[]) => {
     console.log("Starting saving favorite devices to storage");
     try {
@@ -85,15 +90,27 @@ const GlobalProvider = ({ children }: { children: ReactNode }) => {
             distance: undefined,
             isOutOfRange: true,
           }));
-          setAllDevices(favorites);
+          setAllDevices(updatedFavorites);
+          setFavoriteDevices(updatedFavorites);
         }
       } catch (error) {
         console.log("Failed to load favorite devices from storage", error);
       }
       console.log("Finished loading favorite devices from storage");
     };
+    const loadUpdateInterval = async () => {
+      try {
+        const storedInterval = await AsyncStorage.getItem('updateInterval');
+        if (storedInterval !== null) {
+          setUpdateInterval(parseInt(storedInterval, 10));
+        }
+      } catch (e) {
+        console.log("Error loading update interval from storage", e);
+      }
+    };
 
     loadFavoriteDevices();
+    loadUpdateInterval();
   }, []);
 
   return (
@@ -117,7 +134,9 @@ const GlobalProvider = ({ children }: { children: ReactNode }) => {
         search,
         setSearch,
         location,
-        setLocation
+        setLocation,
+        updateInterval,
+        setUpdateInterval
       }}
     >
       {children}

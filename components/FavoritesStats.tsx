@@ -45,7 +45,7 @@ export function FavoritesStats({
   );
 
   const activeDevices = favoriteDevices.filter(
-    (device: any) => device.distance < 5
+    (device: any) => device.distance < 50
   );
 
 

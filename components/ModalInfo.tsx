@@ -296,12 +296,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
     display: "flex",
     flexDirection: "row",
-    flexBasis: "48%",
+    width: "48%",
     gap: 10,
     justifyContent: "flex-start",
     alignItems: "center",
     padding: 10,
     borderRadius: 5,
+    height: 60
   },
   input: {
     height: 50,

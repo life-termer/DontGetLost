@@ -1,5 +1,6 @@
 import React, {
   useContext,
+  useState,
   type PropsWithChildren,
   type ReactElement,
 } from "react";
@@ -22,6 +23,7 @@ import { FontAwesome, FontAwesome6 } from "@expo/vector-icons";
 import { Device } from "react-native-ble-plx";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Colors } from "@/constants/Colors";
+import ModalInfo from "./ModalInfo";
 
 export type DeviceCardProps = TextProps & {
   lightColor?: string;
@@ -54,9 +56,9 @@ export default function DeviceCardMap({
   x,
   y,
 }: DeviceCardProps) {
-  const { setIsModalVisible, setCurrentDevice } =
-    useContext(GlobalContext);
+  const { setCurrentDevice } = useContext(GlobalContext);
   const colorScheme = useColorScheme();
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
   const colorGreen = useThemeColor(
     { light: lightColor, dark: darkColor },
@@ -98,10 +100,8 @@ export default function DeviceCardMap({
     if (distance === undefined) {
       return colorIcon;
     }
-    if (distance < 5) {
+    if (distance < 50) {
       return colorGreen;
-    } else if (distance < 50) {
-      return colorBlue;
     } else {
       return colorYellow;
     }
@@ -110,10 +110,8 @@ export default function DeviceCardMap({
     if (distance === undefined) {
       return colorIcon;
     }
-    if (distance < 5) {
+    if (distance < 50) {
       return colorGreenAlpha;
-    } else if (distance < 50) {
-      return colorBlueAlpha;
     } else {
       return colorYellowAlpha;
     }
@@ -121,16 +119,17 @@ export default function DeviceCardMap({
   const colorRed = useThemeColor({ light: lightColor, dark: darkColor }, "red");
   const lineX = width / 2;
   const lineY = heightDevice / 2;
-  const lineWidth = Math.sqrt(
-    (x + DEVICE_SIZE / 2 - lineX) ** 2 +
-      (y + DEVICE_SIZE / 2 - lineY) ** 2
-  ) - DEVICE_SIZE / 2 - 5;
+  const lineWidth =
+    Math.sqrt(
+      (x + DEVICE_SIZE / 2 - lineX) ** 2 + (y + DEVICE_SIZE / 2 - lineY) ** 2
+    ) -
+    DEVICE_SIZE / 2 -
+    5;
   const distanceTextX = lineX + (x + DEVICE_SIZE / 2 - lineX) / 2;
   const distanceTextY = lineY + (y + DEVICE_SIZE / 2 - lineY) / 2;
   return (
     <>
       <View
-      
         style={{
           position: "absolute",
           left: lineX,
@@ -163,14 +162,14 @@ export default function DeviceCardMap({
               translateX: "-50%",
             },
             {
-              translateY:  "-50%",
+              translateY: "-50%",
             },
           ],
           backgroundColor: colorBackground,
           transformOrigin: "left top",
           zIndex: 200,
           borderRadius: 4,
-          boxShadow: `0px 1px 1px 1px ${bgColorStatus(device.distance)}`
+          boxShadow: `0px 1px 1px 1px ${bgColorStatus(device.distance)}`,
         }}
       >
         <ThemedText style={styles.baseText}>
@@ -201,6 +200,13 @@ export default function DeviceCardMap({
         {device.distance?.toFixed(2)}m
       </ThemedText> */}
       </TouchableOpacity>
+      {isModalVisible ? (
+        <ModalInfo
+          device={device}
+          isModalVisible={isModalVisible}
+          setIsModalVisible={setIsModalVisible}
+        />
+      ) : null}
     </>
   );
 }

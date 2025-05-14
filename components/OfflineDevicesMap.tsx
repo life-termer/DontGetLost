@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderRadius: 10,
     position: "absolute",
-    top: 10,
+    top: 20,
     right: 10,
     justifyContent: "center",
     alignItems: "center",

@@ -6,6 +6,7 @@ import TabBarBackground from "@/components/ui/TabBarBackground";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { FontAwesome, FontAwesome6 } from "@expo/vector-icons";
+import Feather from '@expo/vector-icons/Feather';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -91,6 +92,28 @@ export default function TabLayout() {
             },
             tabBarIcon: ({ color }) => (
               <FontAwesome6 size={28} name="map" color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="settings"
+          options={{
+            title: "Settings",
+            headerStyle: {
+              backgroundColor: Colors[colorScheme ?? "light"].backgroundLight,
+              boxShadow: "0px 0px 0px #000",
+            },
+            headerTintColor: Colors[colorScheme ?? "light"].text,
+            headerBackTitleStyle: {
+              fontSize: 14,
+              fontFamily: "MontserratBold",
+            },
+            headerTitleStyle: {
+              textAlign: "center",
+              fontFamily: "MontserratBold",
+            },
+            tabBarIcon: ({ color }) => (
+              <Feather size={28} name="settings" color={color} />
             ),
           }}
         />

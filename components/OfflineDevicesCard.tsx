@@ -1,5 +1,6 @@
 import React, {
   useContext,
+  useState,
   type PropsWithChildren,
   type ReactElement,
 } from "react";
@@ -22,6 +23,7 @@ import { FontAwesome, FontAwesome6 } from "@expo/vector-icons";
 import { Device } from "react-native-ble-plx";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Colors } from "@/constants/Colors";
+import ModalInfo from "./ModalInfo";
 
 export type OfflineDevicesMap = TextProps & {
   lightColor?: string;
@@ -44,8 +46,8 @@ export default function OfflineDevicesCard({
   darkColor,
   device,
 }: OfflineDevicesMap) {
-  const { favoriteDevices, setCurrentDevice, setIsModalVisible } =
-    useContext(GlobalContext);
+  const { favoriteDevices, setCurrentDevice } = useContext(GlobalContext);
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
   const showModal = () => {
     setCurrentDevice(device.id);
@@ -60,15 +62,24 @@ export default function OfflineDevicesCard({
   const colorRed = useThemeColor({ light: lightColor, dark: darkColor }, "red");
 
   return (
-    <TouchableOpacity onPress={showModal}>
-      <ThemedText
-        key={device.id}
-        type="subtitle"
-        style={[{ color: colorRed }, styles.titleText]}
-      >
-        {device.customName || device.name}
-      </ThemedText>
-    </TouchableOpacity>
+    <>
+      <TouchableOpacity onPress={showModal}>
+        <ThemedText
+          key={device.id}
+          type="subtitle"
+          style={[{ color: colorRed }, styles.titleText]}
+        >
+          {device.customName || device.name}
+        </ThemedText>
+      </TouchableOpacity>
+      {isModalVisible ? (
+        <ModalInfo
+          device={device}
+          isModalVisible={isModalVisible}
+          setIsModalVisible={setIsModalVisible}
+        />
+      ) : null}
+    </>
   );
 }
 

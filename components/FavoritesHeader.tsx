@@ -1,23 +1,13 @@
-import { useContext, type PropsWithChildren, type ReactElement } from "react";
+import { useContext} from "react";
 import {
-  Platform,
-  ScrollView,
   StyleSheet,
   type TextProps,
-  TouchableOpacity,
   View,
 } from "react-native";
 
 import { ThemedView } from "@/components/ThemedView";
-import { useBottomTabOverflow } from "@/components/ui/TabBarBackground";
-import { useColorScheme } from "@/hooks/useColorScheme";
 import { GlobalContext } from "@/context/GlobalContext";
-import { ThemedText } from "./ThemedText";
 import { useThemeColor } from "@/hooks/useThemeColor";
-import { FontAwesome, FontAwesome6 } from "@expo/vector-icons";
-import { Device } from "react-native-ble-plx";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { SortingButton } from "./SortingButton2";
 import { FavoritesStats } from "./FavoritesStats";
 
 export type SortOptions = TextProps & {
@@ -54,15 +44,15 @@ export default function FavoritesHeader({ lightColor, darkColor }: SortOptions) 
 
   const nearbyDevices = (devices: any) => {
     const lengthAll = devices.length;
-    const nearbyDevices = devices.filter((device: any) => device.distance <= 5);
+    const offlineDevices = devices.filter((device: any) => device.isOutOfRange);
     const inProximityDevices = devices.filter(
-      (device: any) => device.distance <= 50
+      (device: any) => device.distance < 50
     );
-    if (lengthAll === nearbyDevices.length)
+    if (lengthAll === inProximityDevices.length)
       return 'all';
-    else if (inProximityDevices.length)
-      return 'some';
-    else return 'none';
+    else if (lengthAll === offlineDevices.length)
+      return 'none';
+    else return 'some';
   };
 
   const status = nearbyDevices(favoriteDevices);

@@ -17,7 +17,6 @@ export default function FavoritesScreen() {
     >
       <SubHeader tab="favorites" />
       <ScrollView>
-        {/* TODO: Add sorting and filtering options */}
         <FavoritesHeader />
         <FavoriteDevicesList tab={"favorites"} />
       </ScrollView>

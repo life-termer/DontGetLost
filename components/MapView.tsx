@@ -28,27 +28,28 @@ export type MapViewProps = TextProps & {
 
 const MapView = memo(function MapView({ lightColor, darkColor }: MapViewProps) {
   const colorScheme = useColorScheme();
-  const { favoriteDevices } = useContext(GlobalContext);
-  const activeDevices = favoriteDevices.filter(
-    (device) => device.distance !== undefined
+  const { favoriteDevices, initialState, allDevices } = useContext(GlobalContext);
+  const activeDevices = allDevices.filter(
+    (device: any) => device.distance !== undefined && device.isFavorite
+  );
+  
+  const offlineDevices = allDevices.filter(
+    (device: any) => device.isOutOfRange && device.isFavorite
   );
 
   const nearbyDevices = (devices: any) => {
     const lengthAll = devices.length;
-    const nearbyDevices = devices.filter((device: any) => device.distance <= 5);
     const inProximityDevices = devices.filter(
-      (device: any) => device.distance <= 50
+      (device: any) => device.distance < 50
     );
-    if (lengthAll === nearbyDevices.length)
+    if(initialState) return Colors[colorScheme ?? "light"].background;
+    if (lengthAll === inProximityDevices.length)
       return Colors[colorScheme ?? "light"].greenAlpha2;
-    else if (inProximityDevices.length)
-      return Colors[colorScheme ?? "light"].yellowAlpha;
-    else return Colors[colorScheme ?? "light"].redAlpha2;
+    else if (offlineDevices.length)
+      return Colors[colorScheme ?? "light"].redAlpha2;
+    else return Colors[colorScheme ?? "light"].yellowAlpha;
   };
-  
-  const offlineDevices = favoriteDevices.filter(
-    (device: any) => device.isOutOfRange
-  );
+
 
   return (
     <View
@@ -70,7 +71,7 @@ const MapView = memo(function MapView({ lightColor, darkColor }: MapViewProps) {
         ></View>
       ) : <View />}
       <LegendMap />
-      {offlineDevices.length ? <OfflineDevicesMap offlineDevices={offlineDevices} /> : null}
+      {offlineDevices.length &&  !initialState ? <OfflineDevicesMap offlineDevices={offlineDevices} /> : null}
       <View
         style={{
           width: MY_DEVICE_SIZE,
@@ -90,7 +91,7 @@ const MapView = memo(function MapView({ lightColor, darkColor }: MapViewProps) {
         </ThemedText>
       </View>
       {/* Favorite Devices */}
-      {activeDevices.map((device, index) => {
+      {activeDevices.map((device:any, index) => {
         // Calculate the position of the device based on its distance
         const distance = Math.min(
           device.distance <= 15 ? 15 : device.distance,

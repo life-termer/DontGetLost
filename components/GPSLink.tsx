@@ -7,6 +7,7 @@ import {
   Platform,
   Linking,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 
 import { useThemeColor } from "@/hooks/useThemeColor";
@@ -32,13 +33,32 @@ export function GPSLink({
     const latitude = device.location.latitude ? device.location.latitude : ""; // Replace with your desired latitude
     const longitude = device.location.longitude ? device.location.longitude : ""; // Replace with your desired longitude
     // const label = deviceName || "Device Location";
-    const url = Platform.select({
-      ios: `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`,
-      // android: `geo:${latitude},${longitude}?q=${label}`,
-      android: `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`,
-    });
-    url && Linking.openURL(url);
-  };
+  //   const url = Platform.select({
+  //     ios: `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`,
+  //     // android: `geo:${latitude},${longitude}?q=${label}`,
+  //     android: `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`,
+  //   });
+  //   url && Linking.openURL(url);
+  // };
+
+  // if (typeof latitude !== 'number' || typeof longitude !== 'number') {
+  //     Alert.alert("Invalid location data.");
+  //     return;
+  //   }
+  const url = `geo:${latitude},${longitude}`;
+  
+  Linking.canOpenURL(url)
+    .then(supported => {
+      if (!supported) {
+        Alert.alert('Maps application not available.');
+      } else {
+        
+        console.log('Opening URL:', url);
+        return Linking.openURL(url);
+      }
+    })
+    .catch(err => console.error('An error occurred', err));
+};
 
   const formatDate = (timestamp: number) => {
     return new Date(timestamp).toLocaleDateString("de-DE", {
@@ -71,7 +91,7 @@ export function GPSLink({
         styles.rowContainer,
       ]}
     >
-      <TouchableOpacity onPress={openMap} style={[{ backgroundColor: colorBackground, pointerEvents: device.location ? "auto" : "none", opacity: device.location ? 1 : 0.5 }, styles.dataContainer]}>
+      <TouchableOpacity onPress={openMap} style={[{ backgroundColor: colorBackground, pointerEvents: device.location.latitude ? "auto" : "none", opacity: device.location.latitude ? 1 : 0.5 }, styles.dataContainer]}>
      
         <Entypo name="location" size={24} color={colorBlue} />
         <View>
@@ -121,7 +141,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     display: "flex",
     flexDirection: "row",
-    flexBasis: "48%",
+    width: "48%",
     gap: 10,
     justifyContent: "flex-start",
     alignItems: "center",

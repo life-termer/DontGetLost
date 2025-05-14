@@ -1,37 +1,25 @@
-import {
-  useContext,
-  useEffect,
-  type PropsWithChildren,
-  type ReactElement,
-} from "react";
-import {
-  FlatList,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import Animated, {
-  interpolate,
-  useAnimatedRef,
-  useAnimatedStyle,
-  useScrollViewOffset,
-} from "react-native-reanimated";
-
+import { useCallback, useContext } from "react";
+import { FlatList, StyleSheet, View } from "react-native";
 import { ThemedView } from "@/components/ThemedView";
-import { useBottomTabOverflow } from "@/components/ui/TabBarBackground";
-import { useColorScheme } from "@/hooks/useColorScheme";
 import { GlobalContext } from "@/context/GlobalContext";
-import { ThemedText } from "./ThemedText";
 import DeviceCard from "./DeviceCard";
-import ModalInfo from "./ModalInfo";
-import { ScanningState } from "./ScanningState";
+
+interface Device {
+  id: string;
+  name: string;
+  // Add other device properties here
+}
+
+interface Props {
+  devices: Device[];
+  loadMoreDevices: () => void;
+  isListEnd: boolean;
+}
 
 export default function AllDevicesList() {
-  const { allDevices, sorting, currentDevice, search } =
-    useContext(GlobalContext);
+  const { allDevices, sorting, search } = useContext(GlobalContext);
   //   console.log("AllDevicesList", allDevices);
-  const device = allDevices.find((device: any) => device.id === currentDevice);
+  // const device = allDevices.find((device: any) => device.id === currentDevice);
   const filteredDevices = allDevices
     .filter((device: any) => {
       if (!search) return true;
@@ -50,6 +38,7 @@ export default function AllDevicesList() {
         }
       }
     });
+
   return (
     <>
       {allDevices.length > 0 ? (

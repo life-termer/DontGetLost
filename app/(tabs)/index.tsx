@@ -1,6 +1,6 @@
-import { ScrollView, useColorScheme, View } from "react-native";
+import { ScrollView, RefreshControl, useColorScheme, View } from "react-native";
 import SubHeader from "@/components/SubHeader";
-import { useContext, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import { getUsers } from "@/scripts/firebase-data";
 import AllDevicesList from "@/components/AllDevicesList";
 import { Colors } from "@/constants/Colors";
@@ -11,6 +11,9 @@ import useBLE from "@/hooks/useBLE";
 export default function HomeScreen() {
   const colorScheme = useColorScheme();
   const { bluetoothState } = useBLE();
+  const [page, setPage] = useState(1);
+  const [isListEnd, setIsListEnd] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   interface UserInt {
     name: string;
@@ -25,6 +28,17 @@ export default function HomeScreen() {
   };
   const { isScanning } = useContext(GlobalContext);
 
+  const wait = (timeout: any) => {
+    return new Promise(resolve => setTimeout(resolve, timeout));
+  }
+
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    wait(100).then(() => setRefreshing(false));
+  }, []);
+
   return (
     <View
       style={{
@@ -33,7 +47,11 @@ export default function HomeScreen() {
       }}
     >
       <SubHeader tab="index" />
-      <ScrollView>
+      <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         {isScanning || bluetoothState === "off" ? <ScanningState /> : null}
         <AllDevicesList />
       </ScrollView>

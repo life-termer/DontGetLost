@@ -27,9 +27,9 @@ import { GlobalContext } from "@/context/GlobalContext";
 const DATA_SERVICE_UUID = "19b10000-e8f2-537e-4f6c-d104768a1214";
 const COLOR_CHARACTERISTIC_UUID = "19b10001-e8f2-537e-4f6c-d104768a1217";
 
-const OFFLINE_DEVICES_TIMEOUT = 120000; // 2 minutes
-const UPDATE_INTERVAL = 5000; // 5 seconds
-const LOCATION_UPDATE_INTERVAL = 10000; // 10 seconds
+const OFFLINE_DEVICES_TIMEOUT = 120000;
+// const UPDATE_INTERVAL = 10000;
+const LOCATION_UPDATE_INTERVAL = 15000; 
 
 const bleManager = new BleManager();
 
@@ -37,11 +37,7 @@ function useBLE() {
   const { allDevices, setAllDevices } = useContext(GlobalContext);
   const [connectedDevice, setConnectedDevice] = useState<Device | null>(null);
   const [bluetoothState, setBluetoothState] = useState<"on" | "off">("off");
-  const { isScanning, setIsScanning } = useContext(GlobalContext);
-
-  const [location, setLocation] = useState<Location.LocationObject | null>(
-    null
-  );
+  const { isScanning, setIsScanning, location, setLocation, updateInterval } = useContext(GlobalContext);
 
   // Create a buffer to hold discovered devices
   const deviceBuffer = useRef<Device[]>([]);
@@ -135,8 +131,8 @@ function useBLE() {
     }
   };
 
-  const updateDeviceList = useCallback(
-    (device: Device) => {
+  const updateDeviceList = 
+    (device: Device, location: any) => {
       const txPower = -50; // Replace with the actual TX power of your device
       const distance =
         device.rssi !== null ? calculateDistance(device.rssi, txPower) : -1;
@@ -144,8 +140,8 @@ function useBLE() {
         const existingIndex = prevState.findIndex(
           (d: { id: string }) => d.id === device.id
         );
-
         const existingDevice = prevState[existingIndex];
+        
         const updatedDevice = {
           ...device,
           name: device.name || "Unknown Device",
@@ -163,12 +159,10 @@ function useBLE() {
             longitude: location?.coords.longitude,
           },
         };
-
         if (existingIndex > -1) {
           // Replace existing device
           const updatedDevices = [...prevState];
           updatedDevices[existingIndex] = updatedDevice;
-          console.log("Updating device:", device.id);
           return updatedDevices;
         } else {
           // Add new device
@@ -176,9 +170,7 @@ function useBLE() {
           return [...prevState, updatedDevice];
         }
       });
-    },
-    [setAllDevices, calculateDistance]
-  );
+    };
 
   const getLocation = async () => {
     try {
@@ -248,16 +240,15 @@ function useBLE() {
           deviceBuffer.current.length,
           "devices"
         );
-        deviceBuffer.current.forEach((device) => updateDeviceList(device)); // Update the device list with each device in the buffer
+        deviceBuffer.current.forEach((device) => updateDeviceList(device, location)); // Update the device list with each device in the buffer
         deviceBuffer.current = []; // Clear the buffer
       }
     };
 
-    const intervalId = setInterval(processBuffer, UPDATE_INTERVAL); // Process every 2 seconds
-    console.log("Processing device buffer");
+    const intervalId = setInterval(processBuffer, updateInterval ? updateInterval : 10000);
 
     return () => clearInterval(intervalId); // Clear interval on unmount
-  }, []);
+  }, [location]);
 
   // Periodically remove stale devices
   useEffect(() => {
@@ -282,7 +273,7 @@ function useBLE() {
             })
             .filter(Boolean); // Remove null entries
         });
-      }, 10000); // Check every  10 second
+      }, 30000); // Check every  10 second
 
       if (!isScanning) {
         console.log("Stopping removing stale devices");

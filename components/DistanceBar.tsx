@@ -51,10 +51,8 @@ export default function DistanceBar({
     if (distance === undefined || !isScanning) {
       return colorIcon;
     }
-    if (distance < 5) {
+    if (distance < 50) {
       return colorGreen;
-    } else if (distance < 50) {
-      return colorBlue;
     } else {
       return colorYellow;
     }

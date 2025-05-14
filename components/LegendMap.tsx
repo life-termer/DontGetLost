@@ -2,6 +2,7 @@ import { StyleSheet, type TextProps, View } from "react-native";
 import { ThemedText } from "./ThemedText";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { FontAwesome } from "@expo/vector-icons";
+import { useState } from "react";
 
 export type LegendMap = TextProps & {
   lightColor?: string;
@@ -9,6 +10,9 @@ export type LegendMap = TextProps & {
 };
 
 export default function LegendMap({ lightColor, darkColor }: LegendMap) {
+
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+
   const colorIcon = useThemeColor(
     { light: lightColor, dark: darkColor },
     "icon"
@@ -52,7 +56,7 @@ export default function LegendMap({ lightColor, darkColor }: LegendMap) {
           Nearby
         </ThemedText>
       </View>
-      <View style={{display: 'flex', gap: 3, flexDirection: "row", alignItems: "center"}}>
+      {/* <View style={{display: 'flex', gap: 3, flexDirection: "row", alignItems: "center"}}>
         <FontAwesome
           size={12}
           name="circle"
@@ -61,7 +65,7 @@ export default function LegendMap({ lightColor, darkColor }: LegendMap) {
         <ThemedText type="subtitle" style={styles.titleText}>
           {"<50m"}
         </ThemedText>
-      </View>
+      </View> */}
       <View style={{display: 'flex', gap: 3, flexDirection: "row", alignItems: "center"}}>
         <FontAwesome
           size={12}
@@ -91,11 +95,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 10,
     position: "absolute",
-    bottom: 155,
+    bottom: 120,
     left: 10,
     justifyContent: "center",
     alignItems: "flex-start",
-    zIndex: 100,
+    zIndex: 1000,
     paddingHorizontal: 8,
     paddingVertical: 5,
   },
