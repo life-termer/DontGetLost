@@ -14,7 +14,7 @@ import GlobalProvider, { GlobalContext } from "@/context/GlobalContext";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-// import * as ScreenOrientation from 'expo-screen-orientation';
+import * as ScreenOrientation from "expo-screen-orientation";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -42,20 +42,6 @@ export default function RootLayout() {
   if (!loaded && !error) {
     return null;
   }
-
-  // useEffect(() => {
-  //   async function changeScreenOrientation() {
-  //     await ScreenOrientation.unlockAsync(); // Enable all orientations
-  //     // await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE); // Lock to landscape
-  //     // await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT); // Lock to portrait
-  //   }
-
-  //   changeScreenOrientation();
-
-  //   return () => {
-  //     ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT); // Lock to portrait on unmount
-  //   };
-  // }, []);
 
   return (
     <GestureHandlerRootView>

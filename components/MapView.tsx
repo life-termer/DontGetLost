@@ -13,9 +13,7 @@ import { GlobalContext } from "@/context/GlobalContext";
 import DeviceCardMap from "./DeviceCardMap";
 import OfflineDevicesMap from "./OfflineDevicesMap";
 import LegendMap from "./LegendMap";
-
-const { width, height } = Dimensions.get("window");
-const heightDevice = height - 140;
+import { ScrollView } from "react-native-gesture-handler";
 
 const DEVICE_SIZE = 75; // Size of the device circles
 const MY_DEVICE_SIZE = 50; // Size of the "My Device" circle
@@ -26,13 +24,17 @@ export type MapViewProps = TextProps & {
   darkColor?: string;
 };
 
-const MapView = memo(function MapView({ lightColor, darkColor }: MapViewProps) {
+const MapView = function MapView({ lightColor, darkColor }: MapViewProps) {
   const colorScheme = useColorScheme();
-  const { favoriteDevices, initialState, allDevices } = useContext(GlobalContext);
+  const { favoriteDevices, initialState, allDevices } =
+    useContext(GlobalContext);
+
+  const [dimensions, setDimensions] = useState(() => Dimensions.get("window"));
+  const heightDevice = dimensions.height - 140;
   const activeDevices = allDevices.filter(
     (device: any) => device.distance !== undefined && device.isFavorite
   );
-  
+
   const offlineDevices = allDevices.filter(
     (device: any) => device.isOutOfRange && device.isFavorite
   );
@@ -42,7 +44,7 @@ const MapView = memo(function MapView({ lightColor, darkColor }: MapViewProps) {
     const inProximityDevices = devices.filter(
       (device: any) => device.distance < 50
     );
-    if(initialState) return Colors[colorScheme ?? "light"].background;
+    if (initialState) return Colors[colorScheme ?? "light"].background;
     if (lengthAll === inProximityDevices.length)
       return Colors[colorScheme ?? "light"].greenAlpha2;
     else if (offlineDevices.length)
@@ -50,6 +52,19 @@ const MapView = memo(function MapView({ lightColor, darkColor }: MapViewProps) {
     else return Colors[colorScheme ?? "light"].yellowAlpha;
   };
 
+  useEffect(() => {
+    const handleOrientationChange = () => {
+      const newDimensions = Dimensions.get("window");
+      setDimensions(newDimensions); // Update dimensions when orientation changes
+    };
+
+    const subscription = Dimensions.addEventListener(
+      "change",
+      handleOrientationChange
+    );
+
+    return () => subscription.remove(); // Cleanup listener on unmount
+  }, []);
 
   return (
     <View
@@ -69,9 +84,13 @@ const MapView = memo(function MapView({ lightColor, darkColor }: MapViewProps) {
             styles.overlay,
           ]}
         ></View>
-      ) : <View />}
+      ) : (
+        <View />
+      )}
       <LegendMap />
-      {offlineDevices.length &&  !initialState ? <OfflineDevicesMap offlineDevices={offlineDevices} /> : null}
+      {offlineDevices.length && !initialState ? (
+        <OfflineDevicesMap offlineDevices={offlineDevices} />
+      ) : null}
       <View
         style={{
           width: MY_DEVICE_SIZE,
@@ -79,7 +98,7 @@ const MapView = memo(function MapView({ lightColor, darkColor }: MapViewProps) {
           borderRadius: MY_DEVICE_SIZE / 2,
           backgroundColor: "#000",
           position: "absolute",
-          left: width / 2 - MY_DEVICE_SIZE / 2,
+          left: dimensions.width / 2 - MY_DEVICE_SIZE / 2,
           top: heightDevice / 2 - MY_DEVICE_SIZE / 2,
           justifyContent: "center",
           alignItems: "center",
@@ -91,7 +110,7 @@ const MapView = memo(function MapView({ lightColor, darkColor }: MapViewProps) {
         </ThemedText>
       </View>
       {/* Favorite Devices */}
-      {activeDevices.map((device:any, index) => {
+      {activeDevices.map((device: any, index) => {
         // Calculate the position of the device based on its distance
         const distance = Math.min(
           device.distance <= 15 ? 15 : device.distance,
@@ -99,8 +118,8 @@ const MapView = memo(function MapView({ lightColor, darkColor }: MapViewProps) {
         ); // Limit the distance
         const angle = (index / activeDevices.length) * 2 * Math.PI; // Spread devices around the circle
         const x =
-          width / 2 +
-          distance * (width / (2 * MAX_DISTANCE)) * Math.cos(angle) -
+          dimensions.width / 2 +
+          distance * (dimensions.width / (2 * MAX_DISTANCE)) * Math.cos(angle) -
           DEVICE_SIZE / 2;
         const y =
           heightDevice / 2 +
@@ -111,7 +130,7 @@ const MapView = memo(function MapView({ lightColor, darkColor }: MapViewProps) {
           <DeviceCardMap
             key={device.id}
             device={device}
-            width={width}
+            width={dimensions.width}
             heightDevice={heightDevice}
             DEVICE_SIZE={DEVICE_SIZE}
             x={x}
@@ -121,7 +140,7 @@ const MapView = memo(function MapView({ lightColor, darkColor }: MapViewProps) {
       })}
     </View>
   );
-}); 
+};
 export default MapView;
 
 const styles = StyleSheet.create({

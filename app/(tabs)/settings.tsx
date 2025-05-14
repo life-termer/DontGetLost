@@ -1,5 +1,5 @@
 import { ScrollView, StyleSheet, useColorScheme, View } from "react-native";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Colors } from "@/constants/Colors";
 import { GlobalContext } from "@/context/GlobalContext";
 import { ThemedText } from "@/components/ThemedText";
@@ -9,7 +9,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function Settings() {
   const colorScheme = useColorScheme();
   const { updateInterval, setUpdateInterval } = useContext(GlobalContext);
-
+  const [value, setValue] = useState(updateInterval);
 
   const handleUpdateIntervalChange = (value: number) => {
     setUpdateInterval(value);
@@ -21,11 +21,10 @@ export default function Settings() {
       alignItems: "center",
     },
   });
-
   useEffect(() => {
     const saveUpdateInterval = async (value: number) => {
       try {
-        await AsyncStorage.setItem('updateInterval', value.toString());
+        await AsyncStorage.setItem("updateInterval", value.toString());
       } catch (e) {
         console.log("Error saving update interval to storage", e);
       }
@@ -44,13 +43,15 @@ export default function Settings() {
       }}
     >
       <View style={styles.sliderContainer}>
-        <ThemedText>Update Interval: {updateInterval ? updateInterval / 1000 : ''} s</ThemedText>
+        <ThemedText>
+          Update Interval: {updateInterval ? updateInterval / 1000 : ""} s
+        </ThemedText>
         <Slider
-          style={{ width: 200, height: 40 }}
+          style={{ width: "80%", height: 50 }}
           minimumValue={1000}
           maximumValue={30000}
           step={1000}
-          value={updateInterval ?? 10000}
+          value={value || 10000}
           onValueChange={handleUpdateIntervalChange}
           minimumTrackTintColor={Colors[colorScheme ?? "light"].text}
           maximumTrackTintColor={Colors[colorScheme ?? "light"].red}

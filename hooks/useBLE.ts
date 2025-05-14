@@ -29,7 +29,7 @@ const COLOR_CHARACTERISTIC_UUID = "19b10001-e8f2-537e-4f6c-d104768a1217";
 
 const OFFLINE_DEVICES_TIMEOUT = 120000;
 // const UPDATE_INTERVAL = 10000;
-const LOCATION_UPDATE_INTERVAL = 15000; 
+const LOCATION_UPDATE_INTERVAL = 15000;
 
 const bleManager = new BleManager();
 
@@ -37,7 +37,8 @@ function useBLE() {
   const { allDevices, setAllDevices } = useContext(GlobalContext);
   const [connectedDevice, setConnectedDevice] = useState<Device | null>(null);
   const [bluetoothState, setBluetoothState] = useState<"on" | "off">("off");
-  const { isScanning, setIsScanning, location, setLocation, updateInterval } = useContext(GlobalContext);
+  const { isScanning, setIsScanning, location, setLocation, updateInterval } =
+    useContext(GlobalContext);
 
   // Create a buffer to hold discovered devices
   const deviceBuffer = useRef<Device[]>([]);
@@ -131,46 +132,45 @@ function useBLE() {
     }
   };
 
-  const updateDeviceList = 
-    (device: Device, location: any) => {
-      const txPower = -50; // Replace with the actual TX power of your device
-      const distance =
-        device.rssi !== null ? calculateDistance(device.rssi, txPower) : -1;
-      setAllDevices((prevState: any[]) => {
-        const existingIndex = prevState.findIndex(
-          (d: { id: string }) => d.id === device.id
-        );
-        const existingDevice = prevState[existingIndex];
-        
-        const updatedDevice = {
-          ...device,
-          name: device.name || "Unknown Device",
-          distance: distance,
-          lastUpdated: Date.now(), // Add a timestamp for the last update
-          lastSeen: Date.now(),
-          isFavorite: prevState[existingIndex]?.isFavorite || false, // Preserve favorite status
-          isOutOfRange: false, // Reset out-of-range status when the device is updated
-          customName: prevState[existingIndex]?.customName || undefined, // Preserve customName
-          favoriteTimestamp:
-            prevState[existingIndex]?.favoriteTimestamp || undefined, // Preserve favoriteTimestamp
-          // location: existingDevice?.location, // Preserve existing location
-          location: {
-            latitude: location?.coords.latitude,
-            longitude: location?.coords.longitude,
-          },
-        };
-        if (existingIndex > -1) {
-          // Replace existing device
-          const updatedDevices = [...prevState];
-          updatedDevices[existingIndex] = updatedDevice;
-          return updatedDevices;
-        } else {
-          // Add new device
-          console.log("Adding device to list:", device.id);
-          return [...prevState, updatedDevice];
-        }
-      });
-    };
+  const updateDeviceList = (device: Device, location: any) => {
+    const txPower = -50; // Replace with the actual TX power of your device
+    const distance =
+      device.rssi !== null ? calculateDistance(device.rssi, txPower) : -1;
+    setAllDevices((prevState: any[]) => {
+      const existingIndex = prevState.findIndex(
+        (d: { id: string }) => d.id === device.id
+      );
+      const existingDevice = prevState[existingIndex];
+
+      const updatedDevice = {
+        ...device,
+        name: device.name || "Unknown Device",
+        distance: distance,
+        lastUpdated: Date.now(), // Add a timestamp for the last update
+        lastSeen: Date.now(),
+        isFavorite: prevState[existingIndex]?.isFavorite || false, // Preserve favorite status
+        isOutOfRange: false, // Reset out-of-range status when the device is updated
+        customName: prevState[existingIndex]?.customName || undefined, // Preserve customName
+        favoriteTimestamp:
+          prevState[existingIndex]?.favoriteTimestamp || undefined, // Preserve favoriteTimestamp
+        // location: existingDevice?.location, // Preserve existing location
+        location: {
+          latitude: location?.coords.latitude,
+          longitude: location?.coords.longitude,
+        },
+      };
+      if (existingIndex > -1) {
+        // Replace existing device
+        const updatedDevices = [...prevState];
+        updatedDevices[existingIndex] = updatedDevice;
+        return updatedDevices;
+      } else {
+        // Add new device
+        console.log("Adding device to list:", device.id);
+        return [...prevState, updatedDevice];
+      }
+    });
+  };
 
   const getLocation = async () => {
     try {
@@ -240,15 +240,20 @@ function useBLE() {
           deviceBuffer.current.length,
           "devices"
         );
-        deviceBuffer.current.forEach((device) => updateDeviceList(device, location)); // Update the device list with each device in the buffer
+        deviceBuffer.current.forEach((device) =>
+          updateDeviceList(device, location)
+        ); // Update the device list with each device in the buffer
         deviceBuffer.current = []; // Clear the buffer
       }
     };
 
-    const intervalId = setInterval(processBuffer, updateInterval ? updateInterval : 10000);
+    const intervalId = setInterval(
+      processBuffer,
+      updateInterval ? updateInterval : 10000
+    );
 
     return () => clearInterval(intervalId); // Clear interval on unmount
-  }, [location]);
+  }, [location, updateInterval]);
 
   // Periodically remove stale devices
   useEffect(() => {

@@ -1,13 +1,13 @@
 import { ScrollView, RefreshControl, useColorScheme, View } from "react-native";
 import SubHeader from "@/components/SubHeader";
-import { useCallback, useContext, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { getUsers } from "@/scripts/firebase-data";
 import AllDevicesList from "@/components/AllDevicesList";
 import { Colors } from "@/constants/Colors";
 import { ScanningState } from "@/components/ScanningState";
 import { GlobalContext } from "@/context/GlobalContext";
 import useBLE from "@/hooks/useBLE";
-
+import * as ScreenOrientation from "expo-screen-orientation";
 export default function HomeScreen() {
   const colorScheme = useColorScheme();
   const { bluetoothState } = useBLE();
@@ -29,14 +29,25 @@ export default function HomeScreen() {
   const { isScanning } = useContext(GlobalContext);
 
   const wait = (timeout: any) => {
-    return new Promise(resolve => setTimeout(resolve, timeout));
-  }
+    return new Promise((resolve) => setTimeout(resolve, timeout));
+  };
 
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     wait(100).then(() => setRefreshing(false));
+  }, []);
+  useEffect(() => {
+    const unlockOrientation = async () => {
+      await ScreenOrientation.unlockAsync(); // Enable all orientations
+    };
+
+    unlockOrientation();
+
+    return () => {
+      ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT); // Lock to portrait on unmount
+    };
   }, []);
 
   return (
