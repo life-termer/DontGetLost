@@ -26,6 +26,7 @@ export function ScanningState({
   ...otherProps
 }: ScanControlProps) {
   const { bluetoothState } = useBLE();
+  const { isScanning } = useContext(GlobalContext);
 
   const colorGreen = useThemeColor(
     { light: lightColor, dark: darkColor },
@@ -50,7 +51,7 @@ export function ScanningState({
           <ThemedText style={styles.text}>Scanning for devices...</ThemedText>
         </>
       )}
-    </View>
+    </View> 
   );
 }
 
@@ -59,7 +60,7 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     width: "100%",
-    paddingTop: 20,
+    paddingBottom: 15,
     justifyContent: "center",
     alignItems: "center",
     gap: 6,

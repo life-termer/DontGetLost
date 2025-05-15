@@ -26,6 +26,8 @@ export const GlobalContext = createContext<{
   setLocation: (value: Location.LocationObject) => void;
   updateInterval: number | null;
   setUpdateInterval: (value: number | null) => void;
+  pageG: number;
+  setPageG: (value: number) => void;
 }>({
   isScanning: false,
   setIsScanning: () => {},
@@ -48,6 +50,8 @@ export const GlobalContext = createContext<{
   setLocation:  () => {},
   updateInterval: 10000,
   setUpdateInterval: () => {},
+  pageG: 1,
+  setPageG: () => {},
 });
 
 const GlobalProvider = ({ children }: { children: ReactNode }) => {
@@ -63,6 +67,7 @@ const GlobalProvider = ({ children }: { children: ReactNode }) => {
     null
   );
   const [updateInterval, setUpdateInterval] = useState<number | null>(10000);
+  const [pageG, setPageG] = useState(1);
 
   const saveFavoriteDevices2 = async (devices: any[]) => {
     console.log("Starting saving favorite devices to storage");
@@ -136,7 +141,9 @@ const GlobalProvider = ({ children }: { children: ReactNode }) => {
         location,
         setLocation,
         updateInterval,
-        setUpdateInterval
+        setUpdateInterval,
+        pageG,
+        setPageG
       }}
     >
       {children}

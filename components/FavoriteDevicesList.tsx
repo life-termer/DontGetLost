@@ -1,11 +1,8 @@
-import { useContext, useEffect } from "react";
-import { StyleSheet, View } from "react-native";
-
-import { ThemedView } from "@/components/ThemedView";
+import { useCallback, useContext, useEffect } from "react";
+import { FlatList, StyleSheet, View } from "react-native";
 import { GlobalContext } from "@/context/GlobalContext";
-import { ThemedText } from "./ThemedText";
-import DeviceCardFavorites from "./DeviceCardFavorites";
 import DeviceCard from "./DeviceCard";
+import FavoritesHeader from "./FavoritesHeader";
 
 export default function FavoriteDevicesList({
   tab,
@@ -31,7 +28,7 @@ export default function FavoriteDevicesList({
           }
         }
       });
-   
+
     if (JSON.stringify(favorites) !== JSON.stringify(favoriteDevices)) {
       setFavoriteDevices(favorites);
     }
@@ -40,17 +37,35 @@ export default function FavoriteDevicesList({
     if (!search) return true;
     return device.name.toLowerCase().includes(search.toLowerCase());
   });
+
+  const renderItem = useCallback(
+    ({ item }: { item: any }) => <DeviceCard device={item} />,
+    []
+  );
+
+  const ListHeader = useCallback(() => {
+    return <FavoritesHeader />; // Render your FavoritesHeader component here
+  }, []);
+
+  const keyExtractor = useCallback((item: any) => item.id, []);
   return (
     <>
       {favoriteDevices.length > 0 ? (
-        <ThemedView style={styles.listContainer}>
-          <ThemedView style={styles.listWrapper}>
-            {filteredFavorites.map((device: any) => (
-              <DeviceCard device={device} key={device.id} />
-            ))}
-          </ThemedView>
-        </ThemedView>
+          <FlatList
+            data={filteredFavorites}
+            renderItem={renderItem}
+            keyExtractor={keyExtractor}
+            removeClippedSubviews={false}
+            ListHeaderComponent={ListHeader}
+          />
       ) : (
+        // <ThemedView style={styles.listContainer}>
+        //   <ThemedView style={styles.listWrapper}>
+        //     {filteredFavorites.map((device: any) => (
+        //       <DeviceCard device={device} key={device.id} />
+        //     ))}
+        //   </ThemedView>
+        // </ThemedView>
         <View />
       )}
     </>
@@ -60,12 +75,13 @@ export default function FavoriteDevicesList({
 const styles = StyleSheet.create({
   listContainer: {
     padding: 16,
-    paddingBottom: 150,
+    height: "100%",
+    paddingBottom: 200,
   },
   listWrapper: {
     display: "flex",
     flexDirection: "column",
-    gap: 10,
+    gap: 0,
   },
   title: {
     paddingLeft: 10,

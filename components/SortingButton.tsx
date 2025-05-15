@@ -47,7 +47,7 @@ export default function SortingButton({
   const styles = StyleSheet.create({
     container: {},
     itemContainer: {
-      width: "50%",
+      width: 200,
       borderColor: colorBorder,
       backgroundColor: colorBackground,
       borderWidth: 1,

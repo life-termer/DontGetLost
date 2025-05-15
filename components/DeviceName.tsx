@@ -1,11 +1,13 @@
 import {
+  KeyboardAvoidingView,
+  Platform,
   StyleSheet,
   TextInput,
   type TextProps,
   TouchableOpacity,
 } from "react-native";
 import { useThemeColor } from "@/hooks/useThemeColor";
-import { useContext, useEffect, useState } from "react";
+import { memo, useContext, useEffect, useState } from "react";
 import { GlobalContext } from "@/context/GlobalContext";
 import { ThemedText } from "./ThemedText";
 import { Octicons } from "@expo/vector-icons";
@@ -26,7 +28,7 @@ export type Props = TextProps & {
   };
 };
 
-export default function DeviceName({ lightColor, darkColor, device }: Props) {
+function DeviceNameComponent({ lightColor, darkColor, device }: Props) {
   const { setAllDevices, saveFavoriteDevices2 } = useContext(GlobalContext);
 
   const [isEditing, setIsEditing] = useState(false);
@@ -81,9 +83,10 @@ export default function DeviceName({ lightColor, darkColor, device }: Props) {
 
     useEffect(() => {
       setCustomName(device.customName || device.name);
-    }, [isEditing]);
+    }, [isEditing, device.customName, device.name]);
 
   return (
+
     <TouchableOpacity
       onPress={() => setIsEditing(true)}
       style={[styles.rowContainer]}
@@ -129,3 +132,6 @@ const styles = StyleSheet.create({
     lineHeight: 16,
   },
 });
+
+const DeviceName = memo(DeviceNameComponent);
+export default DeviceName;

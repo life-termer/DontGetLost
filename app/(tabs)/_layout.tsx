@@ -17,6 +17,9 @@ export default function TabLayout() {
         screenOptions={{
           tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
           headerShown: true,
+          tabBarHideOnKeyboard: true,
+          freezeOnBlur: true,
+          // animation: 'shift',
           tabBarButton: HapticTab,
           tabBarBackground: TabBarBackground,
           tabBarStyle: Platform.select({
@@ -68,6 +71,7 @@ export default function TabLayout() {
               textAlign: "center",
               fontFamily: "MontserratBold",
             },
+            
             tabBarIcon: ({ color }) => (
               <FontAwesome size={28} name="star" color={color} />
             ),

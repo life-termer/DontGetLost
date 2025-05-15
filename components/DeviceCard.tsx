@@ -1,5 +1,7 @@
 import { memo, useContext, useState } from "react";
 import {
+  KeyboardAvoidingView,
+  Platform,
   StyleSheet,
   type TextProps,
   TouchableOpacity,
@@ -79,81 +81,88 @@ const DeviceCard = memo(function DeviceCard({
   };
 
   return (
-    <View
-      style={[
-        { backgroundColor: colorBackgroundLight, borderColor: colorBorder },
-        styles.container,
-      ]}
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <View style={[{ marginBottom: 5 }, styles.rowContainer]}>
-        <View style={[{ gap: 5 }, styles.rowContainer]}>
-          <Feather
-            name="bluetooth"
-            size={16}
-            color={colorStatus(device.distance)}
-          />
-          <DeviceName device={device} />
+      <View
+        style={[
+          { backgroundColor: colorBackgroundLight, borderColor: colorBorder },
+          styles.container,
+        ]}
+      >
+        <View style={[{ marginBottom: 5 }, styles.rowContainer]}>
+          <View style={[{ gap: 5 }, styles.rowContainer]}>
+            <Feather
+              name="bluetooth"
+              size={16}
+              color={colorStatus(device.distance)}
+            />
+            <DeviceName device={device} />
+          </View>
+          <View style={[{ gap: 20 }, styles.rowContainer]}>
+            <TouchableOpacity
+              onPress={showModal}
+              style={{ paddingHorizontal: 10 }}
+            >
+              <FontAwesome size={20} name="info" color={colorIcon} />
+            </TouchableOpacity>
+            <ToggleFavorites device={device} />
+          </View>
         </View>
-        <View style={[{ gap: 20 }, styles.rowContainer]}>
-          <TouchableOpacity
-            onPress={showModal}
-            style={{ paddingHorizontal: 10 }}
-          >
-            <FontAwesome size={20} name="info" color={colorIcon} />
-          </TouchableOpacity>
-          <ToggleFavorites device={device} />
-        </View>
-      </View>
-      <View style={styles.rowContainer}>
-        <View>
-          <ThemedText style={[{ marginBottom: 10 }, styles.baseText]}>
-            {device.id}
-          </ThemedText>
-          <View
-            style={[
-              { justifyContent: "space-between", width: "100%" },
-              styles.rowContainer,
-            ]}
-          >
+        <View style={styles.rowContainer}>
+          <View>
+            <ThemedText style={[{ marginBottom: 10 }, styles.baseText]}>
+              {device.id}
+            </ThemedText>
             <View
               style={[
-                { backgroundColor: colorBackground },
-                styles.dataContainer,
+                { justifyContent: "space-between", width: "100%" },
+                styles.rowContainer,
               ]}
             >
-              <ThemedText style={[{ marginBottom: 4 }, styles.baseText]}>
-                <FontAwesome6 size={12} name="tower-broadcast" /> RSSI
-              </ThemedText>
-              <ThemedText style={[styles.baseText]}>
-                {device.rssi} dBm
-              </ThemedText>
-            </View>
-            <View
-              style={[
-                { backgroundColor: colorBackground },
-                styles.dataContainer,
-              ]}
-            >
-              <ThemedText style={[{ marginBottom: 4 }, styles.baseText]}>
-                <MaterialCommunityIcons name="map-marker-distance" size={14} />{" "}
-                Distance
-              </ThemedText>
-              <ThemedText style={[styles.baseText]}>
-                ~{device.distance?.toFixed(2)}m
-              </ThemedText>
+              <View
+                style={[
+                  { backgroundColor: colorBackground },
+                  styles.dataContainer,
+                ]}
+              >
+                <ThemedText style={[{ marginBottom: 4 }, styles.baseText]}>
+                  <FontAwesome6 size={12} name="tower-broadcast" /> RSSI
+                </ThemedText>
+                <ThemedText style={[styles.baseText]}>
+                  {device.rssi} dBm
+                </ThemedText>
+              </View>
+              <View
+                style={[
+                  { backgroundColor: colorBackground },
+                  styles.dataContainer,
+                ]}
+              >
+                <ThemedText style={[{ marginBottom: 4 }, styles.baseText]}>
+                  <MaterialCommunityIcons
+                    name="map-marker-distance"
+                    size={14}
+                  />{" "}
+                  Distance
+                </ThemedText>
+                <ThemedText style={[styles.baseText]}>
+                  ~{device.distance?.toFixed(2)}m
+                </ThemedText>
+              </View>
             </View>
           </View>
         </View>
+        <DistanceBar device={device} />
+        {isModalVisible ? (
+          <ModalInfo
+            device={device}
+            isModalVisible={isModalVisible}
+            setIsModalVisible={setIsModalVisible}
+          />
+        ) : null}
       </View>
-      <DistanceBar device={device} />
-      {isModalVisible ? (
-        <ModalInfo
-          device={device}
-          isModalVisible={isModalVisible}
-          setIsModalVisible={setIsModalVisible}
-        />
-      ) : null}
-    </View>
+    </KeyboardAvoidingView>
   );
 });
 export default DeviceCard;
@@ -163,6 +172,8 @@ const styles = StyleSheet.create({
     padding: 10,
     borderWidth: 1,
     borderRadius: 10,
+    marginHorizontal: 16,
+    marginBottom: 16,
   },
   dataContainer: {
     textAlign: "center",

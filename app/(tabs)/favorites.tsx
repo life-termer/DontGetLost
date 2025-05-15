@@ -16,10 +16,10 @@ export default function FavoritesScreen() {
       }}
     >
       <SubHeader tab="favorites" />
-      <ScrollView>
-        <FavoritesHeader />
+      <View style={{height: "100%", paddingBottom: 150}}>
+        {/* <FavoritesHeader /> */}
         <FavoriteDevicesList tab={"favorites"} />
-      </ScrollView>
+      </View>
     </View>
   );
 }
