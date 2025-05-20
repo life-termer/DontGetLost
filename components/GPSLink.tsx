@@ -9,12 +9,12 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native";
-
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { ThemedText } from "./ThemedText";
 import Entypo from "@expo/vector-icons/Entypo";
 import Feather from '@expo/vector-icons/Feather';
+// import * as Clipboard from 'expo-clipboard';
 
 export type Props = TextProps & {
   lightColor?: string;
@@ -29,23 +29,22 @@ export function GPSLink({
   device,
   ...otherProps
 }: Props) {
+  const copyToClipboard = async (string: string) => {
+    // await Clipboard.setStringAsync(string);
+  };
   const openMap = () => {
     const latitude = device.location.latitude ? device.location.latitude : ""; // Replace with your desired latitude
     const longitude = device.location.longitude ? device.location.longitude : ""; // Replace with your desired longitude
-    // const label = deviceName || "Device Location";
-  //   const url = Platform.select({
-  //     ios: `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`,
-  //     // android: `geo:${latitude},${longitude}?q=${label}`,
-  //     android: `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`,
-  //   });
-  //   url && Linking.openURL(url);
-  // };
+    const locationString = `${latitude}, ${longitude}`;
 
-  // if (typeof latitude !== 'number' || typeof longitude !== 'number') {
-  //     Alert.alert("Invalid location data.");
-  //     return;
-  //   }
-  const url = `geo:${latitude},${longitude}`;
+    // copyToClipboard(locationString);
+    // Alert.alert(
+    //   "Location copied to clipboard",
+    //   `Latitude: ${latitude}, Longitude: ${longitude}`,
+    //   [{ text: "OK" }]
+    // );
+
+  const url = `geo:${latitude},${longitude}?q=${latitude}, ${longitude}(${device.name})`;
   
   Linking.canOpenURL(url)
     .then(supported => {
