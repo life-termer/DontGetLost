@@ -278,7 +278,7 @@ function useBLE() {
             })
             .filter(Boolean); // Remove null entries
         });
-      }, 30000); // Check every  10 second
+      }, 10000); // Check every  10 second
 
       if (!isScanning) {
         console.log("Stopping removing stale devices");
