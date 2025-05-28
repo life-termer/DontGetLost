@@ -1,24 +1,16 @@
 /* eslint-disable no-bitwise */
 import {
-  useCallback,
   useContext,
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from "react";
 import { PermissionsAndroid, Platform } from "react-native";
 import * as Location from "expo-location";
-// import { throttle } from "lodash";
-
 import * as ExpoDevice from "expo-device";
 
-// import base64 from "react-native-base64";
-
 import {
-  BleError,
   BleManager,
-  Characteristic,
   Device,
   ScanMode,
 } from "react-native-ble-plx";
