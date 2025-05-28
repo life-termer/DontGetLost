@@ -1,6 +1,5 @@
 import { useCallback, useContext, useState } from "react";
 import { FlatList, StyleSheet, View } from "react-native";
-import { ThemedView } from "@/components/ThemedView";
 import { GlobalContext } from "@/context/GlobalContext";
 import DeviceCard from "./DeviceCard";
 import { ThemedText } from "./ThemedText";

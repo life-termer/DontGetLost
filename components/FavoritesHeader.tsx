@@ -46,7 +46,7 @@ export default function FavoritesHeader({ lightColor, darkColor }: SortOptions) 
     const lengthAll = devices.length;
     const offlineDevices = devices.filter((device: any) => device.isOutOfRange);
     const inProximityDevices = devices.filter(
-      (device: any) => device.distance < 50
+      (device: any) => device.distance <= 50
     );
     if (lengthAll === inProximityDevices.length)
       return 'all';

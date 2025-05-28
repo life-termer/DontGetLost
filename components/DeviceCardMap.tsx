@@ -1,28 +1,18 @@
 import React, {
   useContext,
   useState,
-  type PropsWithChildren,
-  type ReactElement,
 } from "react";
 import {
-  Platform,
-  ScrollView,
   StyleSheet,
   type TextProps,
   TouchableOpacity,
   View,
 } from "react-native";
 
-import { ThemedView } from "@/components/ThemedView";
-import { useBottomTabOverflow } from "@/components/ui/TabBarBackground";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { GlobalContext } from "@/context/GlobalContext";
 import { ThemedText } from "./ThemedText";
 import { useThemeColor } from "@/hooks/useThemeColor";
-import { FontAwesome, FontAwesome6 } from "@expo/vector-icons";
-import { Device } from "react-native-ble-plx";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Colors } from "@/constants/Colors";
 import ModalInfo from "./ModalInfo";
 
 export type DeviceCardProps = TextProps & {
@@ -56,8 +46,7 @@ export default function DeviceCardMap({
   x,
   y,
 }: DeviceCardProps) {
-  const { setCurrentDevice } = useContext(GlobalContext);
-  const colorScheme = useColorScheme();
+  const { setCurrentDevice, isScanning } = useContext(GlobalContext);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
   const colorGreen = useThemeColor(
@@ -100,6 +89,9 @@ export default function DeviceCardMap({
     if (distance === undefined) {
       return colorIcon;
     }
+    if(!isScanning) {
+      return colorIcon;
+    }
     if (distance < 50) {
       return colorGreen;
     } else {
@@ -109,6 +101,9 @@ export default function DeviceCardMap({
   const bgColorStatus = (distance: number | undefined) => {
     if (distance === undefined) {
       return colorIcon;
+    }
+    if(!isScanning) {
+      return colorBackground;
     }
     if (distance < 50) {
       return colorGreenAlpha;

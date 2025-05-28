@@ -1,5 +1,5 @@
 import type { PropsWithChildren, ReactElement } from "react";
-import { ScrollView, StyleSheet } from "react-native";
+import { ScrollView } from "react-native";
 import Animated, {
   interpolate,
   useAnimatedRef,

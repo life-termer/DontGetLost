@@ -1,20 +1,15 @@
 import {
-  Text,
   type TextProps,
   StyleSheet,
-  TouchableHighlight,
   View,
-  Platform,
   Linking,
   TouchableOpacity,
   Alert,
 } from "react-native";
 import { useThemeColor } from "@/hooks/useThemeColor";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { ThemedText } from "./ThemedText";
 import Entypo from "@expo/vector-icons/Entypo";
 import Feather from '@expo/vector-icons/Feather';
-// import * as Clipboard from 'expo-clipboard';
 
 export type Props = TextProps & {
   lightColor?: string;

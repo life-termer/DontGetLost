@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, memo } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   StyleSheet,
   View,
@@ -13,7 +13,6 @@ import { GlobalContext } from "@/context/GlobalContext";
 import DeviceCardMap from "./DeviceCardMap";
 import OfflineDevicesMap from "./OfflineDevicesMap";
 import LegendMap from "./LegendMap";
-import { ScrollView } from "react-native-gesture-handler";
 
 const DEVICE_SIZE = 75; // Size of the device circles
 const MY_DEVICE_SIZE = 50; // Size of the "My Device" circle
@@ -24,9 +23,9 @@ export type MapViewProps = TextProps & {
   darkColor?: string;
 };
 
-const MapView = function MapView({ lightColor, darkColor }: MapViewProps) {
+export default function MapView({ lightColor, darkColor }: MapViewProps) {
   const colorScheme = useColorScheme();
-  const { favoriteDevices, initialState, allDevices } =
+  const { initialState, allDevices, isScanning } =
     useContext(GlobalContext);
 
   const [dimensions, setDimensions] = useState(() => Dimensions.get("window"));
@@ -35,22 +34,38 @@ const MapView = function MapView({ lightColor, darkColor }: MapViewProps) {
     (device: any) => device.distance !== undefined && device.isFavorite
   );
 
+  const favoriteDevices = allDevices.filter(
+    (device: any) => device.isFavorite
+  );
   const offlineDevices = allDevices.filter(
     (device: any) => device.isOutOfRange && device.isFavorite
   );
+  const inProximityDevices = allDevices.filter(
+    (device: any) => device.distance <= 50 && device.isFavorite
+  );
 
-  const nearbyDevices = (devices: any) => {
-    const lengthAll = devices.length;
-    const inProximityDevices = devices.filter(
-      (device: any) => device.distance < 50
+  const nearbyDevices = () => {
+    
+    // const inProximityDevices = devices.filter(
+    //   (device: any) => device.distance < 50
+    // );
+    console.log(
+      favoriteDevices.length,
+      "all",
+      inProximityDevices.length,
+      "in proximity",
+      offlineDevices.length,
+      "offline",
     );
     if (initialState) return Colors[colorScheme ?? "light"].background;
-    if (lengthAll === inProximityDevices.length)
+    if (!isScanning) return Colors[colorScheme ?? "light"].background;
+    if (offlineDevices.length) return Colors[colorScheme ?? "light"].redAlpha2;
+    if (favoriteDevices.length === inProximityDevices.length)
       return Colors[colorScheme ?? "light"].greenAlpha2;
-    else if (offlineDevices.length)
-      return Colors[colorScheme ?? "light"].redAlpha2;
-    else return Colors[colorScheme ?? "light"].yellowAlpha;
+    else return Colors[colorScheme ?? "light"].background;
   };
+
+  const backgroundColor = nearbyDevices();
 
   useEffect(() => {
     const handleOrientationChange = () => {
@@ -80,7 +95,7 @@ const MapView = function MapView({ lightColor, darkColor }: MapViewProps) {
       {favoriteDevices.length ? (
         <View
           style={[
-            { backgroundColor: nearbyDevices(favoriteDevices) },
+            { backgroundColor: backgroundColor },
             styles.overlay,
           ]}
         ></View>
@@ -141,7 +156,6 @@ const MapView = function MapView({ lightColor, darkColor }: MapViewProps) {
     </View>
   );
 };
-export default MapView;
 
 const styles = StyleSheet.create({
   text: {

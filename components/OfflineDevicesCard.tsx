@@ -1,28 +1,16 @@
 import React, {
   useContext,
   useState,
-  type PropsWithChildren,
-  type ReactElement,
 } from "react";
 import {
-  Platform,
-  ScrollView,
   StyleSheet,
   type TextProps,
   TouchableOpacity,
-  View,
 } from "react-native";
 
-import { ThemedView } from "@/components/ThemedView";
-import { useBottomTabOverflow } from "@/components/ui/TabBarBackground";
-import { useColorScheme } from "@/hooks/useColorScheme";
 import { GlobalContext } from "@/context/GlobalContext";
 import { ThemedText } from "./ThemedText";
 import { useThemeColor } from "@/hooks/useThemeColor";
-import { FontAwesome, FontAwesome6 } from "@expo/vector-icons";
-import { Device } from "react-native-ble-plx";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Colors } from "@/constants/Colors";
 import ModalInfo from "./ModalInfo";
 
 export type OfflineDevicesMap = TextProps & {
@@ -46,7 +34,7 @@ export default function OfflineDevicesCard({
   darkColor,
   device,
 }: OfflineDevicesMap) {
-  const { favoriteDevices, setCurrentDevice } = useContext(GlobalContext);
+  const { setCurrentDevice } = useContext(GlobalContext);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
   const showModal = () => {

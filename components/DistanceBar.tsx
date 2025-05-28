@@ -1,7 +1,5 @@
 import { StyleSheet, type TextProps, View } from "react-native";
-import { ThemedText } from "./ThemedText";
 import { useThemeColor } from "@/hooks/useThemeColor";
-import { FontAwesome } from "@expo/vector-icons";
 import { useContext } from "react";
 import { GlobalContext } from "@/context/GlobalContext";
 

@@ -1,8 +1,5 @@
 import {
-  Linking,
   Modal,
-  Platform,
-  Pressable,
   ScrollView,
   StyleSheet,
   TextInput,
@@ -13,7 +10,6 @@ import {
 import { ThemedText } from "./ThemedText";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import {
-  FontAwesome,
   FontAwesome6,
   MaterialCommunityIcons,
   MaterialIcons,

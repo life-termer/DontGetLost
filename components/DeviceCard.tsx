@@ -13,7 +13,6 @@ import { ThemedText } from "./ThemedText";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { FontAwesome, FontAwesome6 } from "@expo/vector-icons";
 import DistanceBar from "./DistanceBar";
-import Octicons from "@expo/vector-icons/Octicons";
 import Feather from "@expo/vector-icons/Feather";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import ToggleFavorites from "./ToggleFavorites";

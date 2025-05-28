@@ -1,11 +1,9 @@
 import { StyleSheet, useColorScheme, View } from "react-native";
-
 import { ThemedView } from "@/components/ThemedView";
 import { ScanBtn } from "@/components/ScanBtn";
 import { Colors } from "@/constants/Colors";
 import SearchBtn from "./SearchBtn";
 import { ClearBtn } from "./ClearBtn";
-import DropdownComponent from "./SortingButton";
 import SortingButton from "./SortingButton";
 
 interface Props {

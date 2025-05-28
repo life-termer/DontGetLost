@@ -1,8 +1,6 @@
 import {
-  Text,
   type TextProps,
   StyleSheet,
-  TouchableHighlight,
   TouchableOpacity,
 } from "react-native";
 

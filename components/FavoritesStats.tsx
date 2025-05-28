@@ -1,18 +1,12 @@
 import {
-  Text,
   type TextProps,
   StyleSheet,
-  TouchableHighlight,
-  Pressable,
   View,
-  TouchableOpacity,
 } from "react-native";
 
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { ThemedText } from "./ThemedText";
-import { Picker } from "@react-native-picker/picker";
-import { useContext, useState } from "react";
-import { ThemedView } from "./ThemedView";
+import { useContext } from "react";
 import { GlobalContext } from "@/context/GlobalContext";
 import AntDesign from '@expo/vector-icons/AntDesign';
 

@@ -1,19 +1,13 @@
 import {
-  Text,
   type TextProps,
   StyleSheet,
-  TouchableHighlight,
   TouchableOpacity,
 } from "react-native";
 
 import { useThemeColor } from "@/hooks/useThemeColor";
-import { ThemedView } from "./ThemedView";
-import Feather from "@expo/vector-icons/Feather";
 import { useContext } from "react";
 import { GlobalContext } from "@/context/GlobalContext";
 import { ThemedText } from "./ThemedText";
-import Ionicons from "@expo/vector-icons/Ionicons";
-import useBLE from "@/hooks/useBLE";
 
 export type ScanControlProps = TextProps & {
   lightColor?: string;

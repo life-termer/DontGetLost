@@ -1,9 +1,7 @@
 import {
-  Text,
   type TextProps,
   StyleSheet,
   View,
-  TouchableOpacity,
 } from "react-native";
 
 import { useThemeColor } from "@/hooks/useThemeColor";

@@ -1,6 +1,4 @@
 import {
-  KeyboardAvoidingView,
-  Platform,
   StyleSheet,
   TextInput,
   type TextProps,
