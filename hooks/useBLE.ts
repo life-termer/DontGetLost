@@ -1,19 +1,10 @@
 /* eslint-disable no-bitwise */
-import {
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { PermissionsAndroid, Platform } from "react-native";
 import * as Location from "expo-location";
 import * as ExpoDevice from "expo-device";
 
-import {
-  BleManager,
-  Device,
-  ScanMode,
-} from "react-native-ble-plx";
+import { BleManager, Device, ScanMode } from "react-native-ble-plx";
 import { GlobalContext } from "@/context/GlobalContext";
 
 const DATA_SERVICE_UUID = "19b10000-e8f2-537e-4f6c-d104768a1214";

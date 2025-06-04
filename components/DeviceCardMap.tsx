@@ -1,7 +1,4 @@
-import React, {
-  useContext,
-  useState,
-} from "react";
+import React, { useContext, useState } from "react";
 import {
   StyleSheet,
   type TextProps,
@@ -89,7 +86,7 @@ export default function DeviceCardMap({
     if (distance === undefined) {
       return colorIcon;
     }
-    if(!isScanning) {
+    if (!isScanning) {
       return colorIcon;
     }
     if (distance < 50) {
@@ -102,7 +99,7 @@ export default function DeviceCardMap({
     if (distance === undefined) {
       return colorIcon;
     }
-    if(!isScanning) {
+    if (!isScanning) {
       return colorBackground;
     }
     if (distance < 50) {
@@ -220,10 +217,10 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   baseText: {
-    fontSize: 13,
+    fontSize: 22,
     margin: 0,
     padding: 0,
-    lineHeight: 15,
+    lineHeight: 26,
     textAlign: "center",
     paddingHorizontal: 4,
     paddingVertical: 2,

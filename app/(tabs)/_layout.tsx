@@ -6,10 +6,12 @@ import TabBarBackground from "@/components/ui/TabBarBackground";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { FontAwesome, FontAwesome6 } from "@expo/vector-icons";
-import Feather from '@expo/vector-icons/Feather';
+import Feather from "@expo/vector-icons/Feather";
+import { useKeepAwake } from "expo-keep-awake";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  useKeepAwake();
 
   return (
     <>
@@ -71,7 +73,7 @@ export default function TabLayout() {
               textAlign: "center",
               fontFamily: "MontserratBold",
             },
-            
+
             tabBarIcon: ({ color }) => (
               <FontAwesome size={28} name="star" color={color} />
             ),
