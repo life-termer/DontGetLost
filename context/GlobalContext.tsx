@@ -1,8 +1,14 @@
 import { createContext, useState, useEffect } from "react";
 import { ReactNode } from "react";
 import { Device } from "react-native-ble-plx";
-import * as Location from "expo-location"
+import * as Location from "expo-location";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const OFFLINE_DEVICES_TIMEOUT = 120000;
+const POSSIBLE_OFFLINE_TIMEOUT = 30000;
+// const UPDATE_INTERVAL = 10000;
+const LOCATION_UPDATE_INTERVAL = 15000;
+const SCAN_RESTART_INTERVAL = 12000; // 3 minutes
 
 export const GlobalContext = createContext<{
   isScanning: boolean;
@@ -20,7 +26,7 @@ export const GlobalContext = createContext<{
   setIsModalVisible: (value: boolean) => void;
   currentDevice: any;
   setCurrentDevice: (value: any) => void;
-  search: string,
+  search: string;
   setSearch: (value: string) => void;
   location: Location.LocationObject | null;
   setLocation: (value: Location.LocationObject) => void;
@@ -47,7 +53,7 @@ export const GlobalContext = createContext<{
   search: "",
   setSearch: () => {},
   location: null,
-  setLocation:  () => {},
+  setLocation: () => {},
   updateInterval: 10000,
   setUpdateInterval: () => {},
   pageG: 1,
@@ -105,7 +111,7 @@ const GlobalProvider = ({ children }: { children: ReactNode }) => {
     };
     const loadUpdateInterval = async () => {
       try {
-        const storedInterval = await AsyncStorage.getItem('updateInterval');
+        const storedInterval = await AsyncStorage.getItem("updateInterval");
         if (storedInterval !== null) {
           setUpdateInterval(parseInt(storedInterval, 10));
         }
@@ -117,6 +123,89 @@ const GlobalProvider = ({ children }: { children: ReactNode }) => {
     loadFavoriteDevices();
     loadUpdateInterval();
   }, []);
+
+  // Periodically remove stale devices
+  let removeStaleDevicesId: NodeJS.Timeout | null = null;
+  useEffect(() => {
+    console.log("Set interval to remove stale devices");
+    if (isScanning) {
+      console.log(isScanning);
+      removeStaleDevicesId = setInterval(() => {
+        console.log("Removing stale devices");
+        setAllDevices((prevState: any[]) => {
+          const now = Date.now();
+          return prevState
+            .map((device) => {
+              if (now - device.lastUpdated > OFFLINE_DEVICES_TIMEOUT) {
+                // Mark devices as out of range
+                return {
+                  ...device,
+                  isOutOfRange: true,
+                  distance: undefined,
+                  rssi: undefined,
+                };
+              }
+              if (now - device.lastUpdated > POSSIBLE_OFFLINE_TIMEOUT) {
+                // Mark devices as out of range
+                return {
+                  ...device,
+                  possibleOffline: true,
+                };
+              }
+              // Reset out-of-range status for devices that are updated
+              return { ...device, isOutOfRange: false };
+            })
+            .filter(Boolean); // Remove null entries
+        });
+      }, 10000); // Check every  10 second
+    } else {
+      if (removeStaleDevicesId !== null) {
+        clearInterval(removeStaleDevicesId); // Cleanup interval on unmount
+        console.log("Clean up removing");
+      }
+    }
+
+    return () => {
+      if (removeStaleDevicesId !== null) {
+        clearInterval(removeStaleDevicesId); // Cleanup interval on unmount
+        console.log("Clean up removing");
+      }
+    };
+  }, [isScanning]);
+
+  const getLocation = async () => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        console.log("Location permission denied");
+        return;
+      }
+      const currentLocation = await Location.getCurrentPositionAsync({});
+      setLocation(currentLocation);
+      console.log("Get Location");
+    } catch (error) {
+      console.log("Error getting location", error);
+    }
+  };
+  // Get GPS location
+  let locationId: NodeJS.Timeout | null = null;
+  useEffect(() => {
+    if (isScanning) {
+      console.log("Location interval set");
+      getLocation(); // Get initial location
+      locationId = setInterval(getLocation, LOCATION_UPDATE_INTERVAL);
+    } else {
+      if (locationId !== null) {
+        clearInterval(locationId);
+        console.log("Location interval cleared");
+      }
+    }
+    return () => {
+      if (locationId !== null) {
+        clearInterval(locationId); // Cleanup interval on unmount
+      }
+    };
+  }, [isScanning]);
 
   return (
     <GlobalContext.Provider
@@ -143,7 +232,7 @@ const GlobalProvider = ({ children }: { children: ReactNode }) => {
         updateInterval,
         setUpdateInterval,
         pageG,
-        setPageG
+        setPageG,
       }}
     >
       {children}

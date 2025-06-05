@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router";
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import { Platform } from "react-native";
 import { HapticTab } from "@/components/HapticTab";
 import TabBarBackground from "@/components/ui/TabBarBackground";
@@ -8,10 +8,50 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { FontAwesome, FontAwesome6 } from "@expo/vector-icons";
 import Feather from "@expo/vector-icons/Feather";
 import { useKeepAwake } from "expo-keep-awake";
+import { GlobalContext } from "@/context/GlobalContext";
+import useBLE from "@/hooks/useBLE";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   useKeepAwake();
+  const { isScanning, setIsScanning, location, setLocation, updateInterval } =
+      useContext(GlobalContext);
+    const {
+    requestPermissions,
+    scanForPeripherals,
+    stopScanForPeripherals,
+    bluetoothState,
+  } = useBLE();
+
+    // Restart scanning in X milliseconds
+  useEffect(() => {
+    let scanTimeout: NodeJS.Timeout | null = null;
+
+    const startScanning = () => {
+      if (isScanning) {
+        stopScanForPeripherals();
+        scanForPeripherals();
+        console.log("Stopping and restarting scan...");
+      }
+    };
+
+    if (isScanning) {
+      scanTimeout = setInterval(startScanning, 100000);
+    }
+    if (!isScanning) {
+      if (scanTimeout) {
+        clearInterval(scanTimeout);
+        console.log("Cleared scan interval");
+      }
+    }
+    return () => {
+      if (scanTimeout) {
+        clearInterval(scanTimeout);
+        console.log("Cleared scan interval");
+      }
+      // bleManager.stopDeviceScan();
+    };
+  }, [isScanning]);
 
   return (
     <>

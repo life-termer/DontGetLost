@@ -30,6 +30,7 @@ export type DeviceCardProps = TextProps & {
     isFavorite: boolean;
     isOutOfRange: boolean;
     customName: string;
+    possibleOffline: boolean;
   };
 };
 
@@ -83,10 +84,10 @@ export default function DeviceCardMap({
     setIsModalVisible(true);
   };
   const colorStatus = (distance: number | undefined) => {
-    if (distance === undefined) {
+    if (distance === undefined || device.possibleOffline) {
       return colorIcon;
     }
-    if (!isScanning) {
+    if (!isScanning || device.possibleOffline) {
       return colorIcon;
     }
     if (distance < 50) {
@@ -99,7 +100,7 @@ export default function DeviceCardMap({
     if (distance === undefined) {
       return colorIcon;
     }
-    if (!isScanning) {
+    if (!isScanning || device.possibleOffline) {
       return colorBackground;
     }
     if (distance < 50) {

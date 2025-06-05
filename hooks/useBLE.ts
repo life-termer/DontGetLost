@@ -1,7 +1,6 @@
 /* eslint-disable no-bitwise */
 import { useContext, useEffect, useRef, useState } from "react";
 import { PermissionsAndroid, Platform } from "react-native";
-import * as Location from "expo-location";
 import * as ExpoDevice from "expo-device";
 
 import { BleManager, Device, ScanMode } from "react-native-ble-plx";
@@ -9,10 +8,6 @@ import { GlobalContext } from "@/context/GlobalContext";
 
 const DATA_SERVICE_UUID = "19b10000-e8f2-537e-4f6c-d104768a1214";
 const COLOR_CHARACTERISTIC_UUID = "19b10001-e8f2-537e-4f6c-d104768a1217";
-
-const OFFLINE_DEVICES_TIMEOUT = 120000;
-// const UPDATE_INTERVAL = 10000;
-const LOCATION_UPDATE_INTERVAL = 15000;
 
 const bleManager = new BleManager();
 
@@ -25,6 +20,7 @@ function useBLE() {
 
   // Create a buffer to hold discovered devices
   const deviceBuffer = useRef<Device[]>([]);
+  const [restart, setRestart] = useState(false);
 
   bleManager.onStateChange((state) => {
     if (state === "PoweredOn") {
@@ -141,6 +137,7 @@ function useBLE() {
           latitude: location?.coords.latitude,
           longitude: location?.coords.longitude,
         },
+        possibleOffline: false,
       };
       if (existingIndex > -1) {
         // Replace existing device
@@ -155,20 +152,6 @@ function useBLE() {
     });
   };
 
-  const getLocation = async () => {
-    try {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        console.log("Location permission denied");
-        return;
-      }
-      const currentLocation = await Location.getCurrentPositionAsync({});
-      setLocation(currentLocation);
-      console.log("Get Location");
-    } catch (error) {
-      console.log("Error getting location", error);
-    }
-  };
 
   // const throttledUpdateDeviceList = useCallback(
   //   throttle((device: Device) => {
@@ -177,6 +160,7 @@ function useBLE() {
   //   [updateDeviceList]
   // );
 
+
   const scanForPeripherals = () => {
     bleManager.state().then((state) => {
       if (state !== "PoweredOn") {
@@ -184,7 +168,6 @@ function useBLE() {
         return;
       }
       console.log("Starting device scan...");
-
       bleManager.startDeviceScan(
         null,
         {
@@ -200,18 +183,56 @@ function useBLE() {
           }
 
           if (!device) {
+            console.log("No devices");
             return;
           }
 
           if (true) {
             // Add the discovered device to the buffer
             deviceBuffer.current = [...deviceBuffer.current, device];
+            // console.log("Devices being added to buffer...");
+            // updateDeviceList(device, location);
             // throttledUpdateDeviceList(device);
           }
         }
       );
     });
   };
+
+  const stopScanForPeripherals = () => {
+    bleManager.stopDeviceScan();
+    // setIsScanning(false);
+  };
+
+  // Restart scanning in X milliseconds
+  // useEffect(() => {
+  //   let scanTimeout: NodeJS.Timeout | null = null;
+
+  //   const startScanning = () => {
+  //     if (isScanning) {
+  //       bleManager.stopDeviceScan();
+  //       scanForPeripherals();
+  //       console.log("Stopping and restarting scan...");
+  //     }
+  //   };
+
+  //   if (isScanning) {
+  //     scanTimeout = setInterval(startScanning, 10000);
+  //   }
+  //   if (!isScanning) {
+  //     if (scanTimeout) {
+  //       clearInterval(scanTimeout);
+  //       console.log("Cleared scan interval");
+  //     }
+  //   }
+  //   return () => {
+  //     if (scanTimeout) {
+  //       clearInterval(scanTimeout);
+  //       console.log("Cleared scan interval");
+  //     }
+  //     // bleManager.stopDeviceScan();
+  //   };
+  // }, [restart]);
 
   // Process the device buffer every X milliseconds
   useEffect(() => {
@@ -229,75 +250,23 @@ function useBLE() {
         deviceBuffer.current = []; // Clear the buffer
       }
     };
-
-    const intervalId = setInterval(
-      processBuffer,
-      updateInterval ? updateInterval : 10000
-    );
-
-    return () => clearInterval(intervalId); // Clear interval on unmount
-  }, [location, updateInterval]);
-
-  // Periodically remove stale devices
-  useEffect(() => {
-    if (isScanning) {
-      const interval = setInterval(() => {
-        console.log("Removing stale devices");
-        setAllDevices((prevState: any[]) => {
-          const now = Date.now();
-          return prevState
-            .map((device) => {
-              if (now - device.lastUpdated > OFFLINE_DEVICES_TIMEOUT) {
-                // Mark devices as out of range
-                return {
-                  ...device,
-                  isOutOfRange: true,
-                  distance: undefined,
-                  rssi: undefined,
-                };
-              }
-              // Reset out-of-range status for devices that are updated
-              return { ...device, isOutOfRange: false };
-            })
-            .filter(Boolean); // Remove null entries
-        });
-      }, 10000); // Check every  10 second
-
-      if (!isScanning) {
-        console.log("Stopping removing stale devices");
-        clearInterval(interval); // Stop checking when not scanning
-      }
-
-      return () => clearInterval(interval); // Cleanup on unmount
-    }
-  }, [isScanning]);
-
-  const stopScanForPeripherals = () => {
-    bleManager.stopDeviceScan();
-    setIsScanning(false);
-  };
-
-  // Get GPS location
-  useEffect(() => {
     let intervalId: NodeJS.Timeout | null = null;
     if (isScanning) {
-      getLocation(); // Get initial location
-      intervalId = setInterval(getLocation, LOCATION_UPDATE_INTERVAL);
-    }
-
-    if (!isScanning) {
-      if (intervalId !== undefined && intervalId !== null) {
-        clearInterval(intervalId);
-        console.log("Location interval cleared");
-      }
+      intervalId = setInterval(
+        processBuffer,
+        updateInterval ? updateInterval : 10000
+      );
     }
     return () => {
       if (intervalId !== null) {
+        deviceBuffer.current = [];
         clearInterval(intervalId); // Cleanup interval on unmount
+        console.log("Clear device buffer processing interval");
       }
     };
-  }, [isScanning]);
+  }, [updateInterval, isScanning]);
 
+  
   return {
     connectedDevice,
     requestPermissions,

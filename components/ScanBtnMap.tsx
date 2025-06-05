@@ -13,6 +13,7 @@ import { GlobalContext } from "@/context/GlobalContext";
 import { ThemedText } from "./ThemedText";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import useBLE from "@/hooks/useBLE";
+import { Entypo } from "@expo/vector-icons";
 
 export type ScanControlProps = TextProps & {
   lightColor?: string;
@@ -87,9 +88,12 @@ export function ScanBtnMap({
       pointerEvents: "auto",
       alignItems: "flex-end",
       position: "absolute",
-      top: 20,
-      left: 10,
-      zIndex: 1000,
+      top: isScanning ? 20 : "50%",
+      left: isScanning ? 10 : "50%",
+      transform: isScanning
+        ? [{ translateX: 0 }, { translateY: 0 }]
+        : [{ translateX: '-50%'}, { translateY: '-65%'}],
+      zIndex: 100000,
     },
     button: {
       display: "flex",
@@ -110,10 +114,11 @@ export function ScanBtnMap({
       alignItems: "center",
       borderWidth: 1,
       borderRadius: 8,
+      // filter: "blur(100px)",
       paddingHorizontal: 10,
-      width: windowDimensions.width / 2,
+      width: windowDimensions.width / 1.6,
       gap: 5,
-      height: windowDimensions.height / 1.6,
+      height: windowDimensions.height / 1.8,
     },
     text: {
       fontSize: 14,
@@ -157,7 +162,7 @@ export function ScanBtnMap({
             styles.buttonXL,
           ]}
         >
-          <Feather name="play" size={24} color={colorGreen} />
+          <Entypo name="controller-play"  size={90} color={colorGreen} />
         </TouchableOpacity>
       )}
     </ThemedView>
